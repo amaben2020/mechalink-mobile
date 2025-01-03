@@ -1,15 +1,15 @@
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import React from 'react';
 import { Link } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Signup() {
   return (
-    <SafeAreaView>
-      <Text>About</Text>
+    <ScrollView className="flex flex-1 bg-white">
+      <Text>Sign up</Text>
       <TouchableOpacity>
         <Link href="/(root)/(tabs)/home">Tab Home</Link>
       </TouchableOpacity>
-    </SafeAreaView>
+    </ScrollView>
   );
 }
