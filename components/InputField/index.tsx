@@ -9,15 +9,16 @@ import {
   TouchableWithoutFeedback,
   Button,
   Keyboard,
+  TextInputProps,
 } from 'react-native';
 import clsx from 'clsx';
 
-type TInputField = {
+interface TInputField extends TextInputProps {
   onChangeText: (text: string) => void;
   label: string;
   placeholder: string;
   className?: string;
-};
+}
 
 const InputField = ({
   onChangeText,
