@@ -1,7 +1,6 @@
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { Text, TouchableOpacity, ScrollView } from 'react-native';
 import React from 'react';
 import { Link } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Signup() {
   return (
