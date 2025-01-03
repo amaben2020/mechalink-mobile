@@ -60,8 +60,6 @@ export default function Signup() {
         // Handle form submission
         console.log('Form submitted successfully:', form);
       }
-      console.log('ERRRORS', errors);
-      console.log('FORMATTED DATA', parsedForm.data);
 
       const data = await fetchAPI(
         'https://node-ci-cd-7.onrender.com/api/v1/auth/register',
@@ -83,7 +81,6 @@ export default function Signup() {
       console.log(error);
     }
   };
-  console.log(isSuccess);
 
   return (
     <ScrollView className="flex flex-1 bg-white">
@@ -178,7 +175,7 @@ export default function Signup() {
         )}
       </View>
 
-      {isSuccess && <ModalComponent />}
+      {true && <ModalComponent />}
 
       <TouchableOpacity onPress={createUser}>
         <Text>Create User</Text>

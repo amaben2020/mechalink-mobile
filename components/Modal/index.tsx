@@ -1,5 +1,7 @@
+import { icons, images } from '@/constants/Icons';
+import { Link } from 'expo-router';
 import React, { useState } from 'react';
-import { Button, Text, View } from 'react-native';
+import { Button, Image, Text, TouchableOpacity, View } from 'react-native';
 import Modal from 'react-native-modal';
 
 function ModalComponent() {
@@ -10,17 +12,25 @@ function ModalComponent() {
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      <Button title="" onPress={toggleModal} />
-
+    <View className="">
       <Modal
         isVisible={isModalVisible}
-        className="bg-white max-h-[300px] flex justify-center mt-40 rounded-2xl"
+        className="bg-white max-h-[500px] flex justify-center mt-40 relative rounded-2xl"
       >
-        <View style={{ flex: 1 }}>
-          <Text className="p-3">Success</Text>
-
+        <TouchableOpacity className="static top-[-30%] right-[-85%] w-12 h-12">
           <Button title="X" onPress={toggleModal} />
+        </TouchableOpacity>
+        <View className="flex justify-center items-center ">
+          <Image source={images.check} className="max-w-[60px] h-[60px]" />
+          <Text className="p-3 font-JakartaBold text-2xl">Success</Text>
+
+          <Link
+            href="/(root)/(auth)/signin"
+            className="font-JakartaBold text-xl bg-primary-500 text-white text-center rounded-full p-3 w-6/12 cursor-pointer"
+            onPress={toggleModal}
+          >
+            Log in
+          </Link>
         </View>
       </Modal>
     </View>
