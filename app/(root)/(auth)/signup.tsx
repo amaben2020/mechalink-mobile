@@ -15,6 +15,7 @@ import { fetchAPI } from '@/lib/fetch';
 import { z } from 'zod';
 import { signupSchema } from '@/schema/signup';
 import ErrorText from '@/components/ErrorText';
+import { Link } from 'expo-router';
 
 export default function Signup() {
   const [isEnabled, setIsEnabled] = useState(true);
@@ -140,6 +141,11 @@ export default function Signup() {
       <TouchableOpacity onPress={createUser}>
         <Text>Create User</Text>
       </TouchableOpacity>
+
+      <Text>
+        Already have an account?{' '}
+        <Link href="/(root)/(auth)/signin">Sign in</Link>
+      </Text>
     </ScrollView>
   );
 }
