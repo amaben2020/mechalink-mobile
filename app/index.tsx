@@ -1,18 +1,12 @@
-import { Link } from 'expo-router';
+import { Link, Redirect } from 'expo-router';
 import { SafeAreaView, Text, TouchableOpacity } from 'react-native';
 
 export default function Home() {
-  return (
-    <SafeAreaView>
-      <Text>
-        HOME: Lorem ipsum dolor, sit amet consectetur adipisicing elit. Officiis
-        iure aperiam ut ex! Non tenetur nostrum quidem quam voluptas debitis
-        earum quos quis amet quasi? Adipisci atque nam nostrum nesciunt.
-      </Text>
+  const isSignedIn = false;
 
-      <TouchableOpacity>
-        <Link href="/(root)/(tabs)/home">Tabs</Link>
-      </TouchableOpacity>
-    </SafeAreaView>
-  );
+  if (!isSignedIn) {
+    return <Redirect href="/(root)/(auth)/welcome" />;
+  }
+
+  return <Redirect href="/(root)/(tabs)/home" />;
 }

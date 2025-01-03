@@ -11,7 +11,9 @@ export default function HomeScreen() {
       </Text>
 
       <TouchableOpacity>
-        <Link href="/(root)/about">About</Link>
+        <Link href="/(root)/about" className="text-red-900 p-3">
+          About
+        </Link>
       </TouchableOpacity>
     </SafeAreaView>
   );
