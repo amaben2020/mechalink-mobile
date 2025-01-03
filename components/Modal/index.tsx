@@ -11,7 +11,7 @@ function ModalComponent() {
 
   return (
     <View style={{ flex: 1 }}>
-      <Button title="Show modal" onPress={toggleModal} />
+      <Button title="" onPress={toggleModal} />
 
       <Modal
         isVisible={isModalVisible}
