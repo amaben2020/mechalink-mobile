@@ -6,33 +6,18 @@ import {
   Switch,
   TouchableOpacity,
 } from 'react-native';
-import React, { Children, useState } from 'react';
-import { Link } from 'expo-router';
+import React, { useState } from 'react';
 import { images } from '@/constants/Icons';
 import InputField from '@/components/InputField';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import ModalComponent from '@/components/Modal';
 import { fetchAPI } from '@/lib/fetch';
 import { z } from 'zod';
+import { signupSchema } from '@/schema/signup';
+import ErrorText from '@/components/ErrorText';
 
 export default function Signup() {
   const [isEnabled, setIsEnabled] = useState(true);
-
-  // Define Zod schema
-  const formSchema = z.object({
-    username: z.string().min(3, 'Username must be at least 3 characters'),
-    email: z.string().email('Invalid email address'),
-    password: z
-      .string()
-      .min(8, 'Password must be at least 8 characters')
-      .regex(
-        /^(?=.*[A-Z])(?=.*\d).*$/,
-        'Password must include a number and an uppercase letter'
-      ),
-    addressOne: z.string().min(2, 'Invalid address'),
-    role: z.enum(['client', 'mechalink']),
-    phone: z.string().min(11, { message: 'Must be 11 digits' }),
-  });
 
   const [form, setForm] = useState({
     username: '',
@@ -49,15 +34,12 @@ export default function Signup() {
 
   const createUser = async () => {
     try {
-      const parsedForm = formSchema.safeParse(form);
-
+      const parsedForm = signupSchema.safeParse(form);
       if (!parsedForm.success) {
-        // Extract error messages
         const newErrors = parsedForm.error.format();
         setErrors(newErrors);
       } else {
         setErrors(null);
-        // Handle form submission
         console.log('Form submitted successfully:', form);
       }
 
@@ -72,10 +54,8 @@ export default function Signup() {
         }
       );
 
-      if (data?.message.includes('created')) {
-        console.log('Yeahhh');
-        setIsSuccess(true);
-      }
+      if (data?.message.includes('created')) setIsSuccess(true);
+
       return data;
     } catch (error) {
       console.log(error);
@@ -99,9 +79,7 @@ export default function Signup() {
           value={form?.username}
         />
         {errors?.username && (
-          <Text style={{ color: 'red', fontStyle: 'italic', marginTop: -16 }}>
-            {errors.username?._errors[0]}
-          </Text>
+          <ErrorText message={errors.username?._errors[0]} />
         )}
         <InputField
           label="Email"
@@ -110,11 +88,7 @@ export default function Signup() {
           textContentType="emailAddress"
           value={form?.email}
         />
-        {errors?.email && (
-          <Text style={{ color: 'red', fontStyle: 'italic', marginTop: -16 }}>
-            {errors.email?._errors[0]}
-          </Text>
-        )}
+        {errors?.email && <ErrorText message={errors.email?._errors[0]} />}
         <InputField
           label="AddressOne"
           placeholder="Enter a AddressOne"
@@ -122,9 +96,7 @@ export default function Signup() {
           value={form?.addressOne}
         />{' '}
         {errors?.addressOne && (
-          <Text style={{ color: 'red', fontStyle: 'italic', marginTop: -16 }}>
-            {errors.addressOne?._errors[0]}
-          </Text>
+          <ErrorText message={errors.addressOne?._errors[0]} />
         )}
         <InputField
           label="Phone"
@@ -132,11 +104,7 @@ export default function Signup() {
           onChangeText={(text) => setForm({ ...form, phone: text })}
           value={form?.phone}
         />
-        {errors?.phone && (
-          <Text style={{ color: 'red', fontStyle: 'italic', marginTop: -16 }}>
-            {errors.phone?._errors[0]}
-          </Text>
-        )}
+        {errors?.phone && <ErrorText message={errors.phone?._errors[0]} />}
         <SafeAreaProvider>
           <View className="flex-1 flex">
             <Switch
@@ -151,13 +119,7 @@ export default function Signup() {
               }
               value={isEnabled}
             />
-            {errors?.role && (
-              <Text
-                style={{ color: 'red', fontStyle: 'italic', marginTop: -16 }}
-              >
-                {errors.role?._errors[0]}
-              </Text>
-            )}
+            {errors?.role && <ErrorText message={errors.role?._errors[0]} />}
 
             <Text className="block"> {isEnabled ? 'Client' : 'Mechanic'}</Text>
           </View>
@@ -169,13 +131,11 @@ export default function Signup() {
           secureTextEntry
         />{' '}
         {errors?.password && (
-          <Text style={{ color: 'red', fontStyle: 'italic', marginTop: -16 }}>
-            {errors.password?._errors[0]}
-          </Text>
+          <ErrorText message={errors.password?._errors[0]} />
         )}
       </View>
 
-      {true && <ModalComponent />}
+      {isSuccess && <ModalComponent />}
 
       <TouchableOpacity onPress={createUser}>
         <Text>Create User</Text>
