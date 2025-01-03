@@ -22,8 +22,6 @@ export default function Signin() {
 
   const { setToken, token } = useSignupStore();
 
-  console.log('TOKEN', token);
-
   const createUser = async () => {
     try {
       const parsedForm = signinSchema.safeParse(form);
@@ -96,7 +94,7 @@ export default function Signin() {
         )}
       </View>
 
-      {isSuccess && <ModalComponent />}
+      {isSuccess && <ModalComponent url="(tabs)/home" linkText="Home" />}
 
       <TouchableOpacity
         onPress={createUser}

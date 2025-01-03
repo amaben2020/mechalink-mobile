@@ -1,10 +1,16 @@
 import { images } from '@/constants/Icons';
-import { Link } from 'expo-router';
+import { Link, RelativePathString } from 'expo-router';
 import React, { useState } from 'react';
 import { Button, Image, Text, TouchableOpacity, View } from 'react-native';
 import Modal from 'react-native-modal';
 
-function ModalComponent() {
+function ModalComponent({
+  url,
+  linkText,
+}: {
+  url?: RelativePathString | any;
+  linkText?: string;
+}) {
   const [isModalVisible, setModalVisible] = useState(true);
 
   const toggleModal = () => {
@@ -25,11 +31,11 @@ function ModalComponent() {
           <Text className="p-3 font-JakartaBold text-2xl">Success</Text>
 
           <Link
-            href="/(root)/(auth)/signin"
+            href={url ? url : '/(root)/(auth)/signin'}
             className="font-JakartaBold text-xl bg-primary-500 text-white text-center rounded-full p-3 w-6/12 cursor-pointer"
             onPress={toggleModal}
           >
-            Log in
+            {linkText ? linkText : 'Log in'}
           </Link>
         </View>
       </Modal>
