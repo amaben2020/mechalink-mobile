@@ -15,7 +15,8 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.algomachine.mechalink"
+      "bundleIdentifier": "com.algomachine.mechalink",
+      "jsEngine": "jsc"
     },
     "android": {
       "adaptiveIcon": {
@@ -25,7 +26,8 @@
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"
-      ]
+      ],
+      "package": "com.algomachine.mechalink"
     },
     "web": {
       "bundler": "metro",
@@ -55,9 +57,7 @@
       "router": {
         "origin": "https://mechalink.com/"
       },
-      "eas": {
-        "projectId": "d94f4331-97c1-4fcc-b63e-ff81b7eba584"
-      }
+      "eas": {}
     },
     "owner": "algomachine"
   }

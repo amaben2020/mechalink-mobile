@@ -1,15 +1,22 @@
+import { useSignupStore } from '@/store/auth/get-user';
 import { useState, useEffect, useCallback } from 'react';
 
 export const fetchAPI = async (url: string, options?: RequestInit) => {
+  // use getState when you wanna opt out of hook
+  const { token } = useSignupStore.getState();
   try {
-    const response = await fetch(url, options);
+    const response = await fetch(url, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      ...options,
+    });
     if (!response.ok) {
       new Error(`HTTP error! status: ${response.status}`);
     }
 
     const res = await response.json();
-
-    console.log('RES', res);
 
     return res;
   } catch (error) {

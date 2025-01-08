@@ -11,16 +11,18 @@ import { useSignupStore } from '@/store/auth/get-user';
 
 export default function Signin() {
   const [form, setForm] = useState({
-    username: '',
     password: ' ',
     email: ' ',
   });
+
   const [isSuccess, setIsSuccess] = useState(false);
   const [errors, setErrors] = useState<z.ZodFormattedError<typeof form> | null>(
     null
   );
 
-  const { setToken, token } = useSignupStore();
+  const [userRole, setUserRole] = useState('');
+
+  const { setToken } = useSignupStore();
 
   const createUser = async () => {
     try {
@@ -38,9 +40,6 @@ export default function Signin() {
         {
           method: 'POST',
           body: JSON.stringify(parsedForm.data),
-          headers: {
-            'Content-Type': 'application/json',
-          },
         }
       );
 
@@ -48,6 +47,7 @@ export default function Signin() {
         setIsSuccess(true);
 
         setToken(data?.user?.stsTokenManager?.accessToken);
+        setUserRole(data?.role);
       }
 
       return data;
@@ -67,20 +67,11 @@ export default function Signin() {
 
       <View className="p-3 gap-5">
         <InputField
-          label="Username"
-          placeholder="Enter a Username"
-          onChangeText={(text) => setForm({ ...form, username: text })}
-          value={form?.username}
-        />
-        {errors?.username && (
-          <ErrorText message={errors.username?._errors[0]} />
-        )}
-        <InputField
           label="Email"
           placeholder="Enter a Email"
           onChangeText={(text) => setForm({ ...form, email: text })}
           textContentType="emailAddress"
-          value={form?.email}
+          value={form?.email.trim()}
         />
         {errors?.email && <ErrorText message={errors.email?._errors[0]} />}
         <InputField
@@ -88,13 +79,19 @@ export default function Signin() {
           placeholder="Enter a Password i.e Password123!"
           onChangeText={(text) => setForm({ ...form, password: text })}
           secureTextEntry
+          value={form.password}
         />{' '}
         {errors?.password && (
           <ErrorText message={errors.password?._errors[0]} />
         )}
       </View>
 
-      {isSuccess && <ModalComponent url="(tabs)/home" linkText="Home" />}
+      {isSuccess && (
+        <ModalComponent
+          url="/(root)/(client-tabs)/home"
+          linkText={`Welcome ${userRole}`}
+        />
+      )}
 
       <TouchableOpacity
         onPress={createUser}
