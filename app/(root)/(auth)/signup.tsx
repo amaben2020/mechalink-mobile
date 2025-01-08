@@ -146,6 +146,11 @@ export default function Signup() {
         Already have an account?{' '}
         <Link href="/(root)/(auth)/signin">Sign in</Link>
       </Text>
+      {/* TODO: REMOVE */}
+      <Text>
+        Already have an account?{' '}
+        <Link href="/(root)/(client-tabs)/home">kEEP WORKING</Link>
+      </Text>
     </ScrollView>
   );
 }

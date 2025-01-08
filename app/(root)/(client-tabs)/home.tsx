@@ -18,6 +18,15 @@ export default function HomeScreen() {
           About
         </Link>
       </TouchableOpacity>
+
+      {/* nearby mechs inside safe area */}
+
+      {/* cards of mechs and online availabilities */}
     </View>
   );
 }
+
+// tab 1: location and nearby mechs
+// tab 2: job creation and nearby mechs
+// tab 3: jobs
+// 4: settings

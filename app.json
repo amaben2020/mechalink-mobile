@@ -48,6 +48,12 @@
           "image": "./assets/images/react-logo@3x.png",
           "resizeMode": "contain"
         }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow Mechalink to use your location."
+        }
       ]
     ],
     "experiments": {
