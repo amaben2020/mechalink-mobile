@@ -21,3 +21,36 @@ export const useSignupStore = create<TAuth>()(
     )
   )
 );
+
+type TUser = {
+  email: string;
+  role: string;
+  fullName?: string;
+  phoneNumber?: string;
+  addressOne?: string;
+  addressTwo?: string;
+  city?: string;
+  state?: string;
+  username?: string;
+  zip?: string;
+  country?: string;
+};
+
+export type TUserStore = {
+  user: TUser;
+  setUser: (user: TUser) => void;
+};
+
+export const useUserStore = create<TUserStore>()(
+  devtools(
+    persist(
+      (set) => ({
+        user: { email: '', role: '' },
+        setUser: (user) => set({ user }),
+      }),
+      {
+        name: 'user-store',
+      }
+    )
+  )
+);

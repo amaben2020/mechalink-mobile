@@ -1,13 +1,14 @@
+import { useUserStore } from '@/store/auth/get-user';
 import { Link } from 'expo-router';
 import { SafeAreaView, Text, TouchableOpacity } from 'react-native';
 
 export default function HomeScreen() {
+  const { user } = useUserStore();
   return (
     <SafeAreaView>
       <Text>
-        HOME: Lorem ipsum dolor, sit amet consectetur adipisicing elit. Officiis
-        iure aperiam ut ex! Non tenetur nostrum quidem quam voluptas debitis
-        earum quos quis amet quasi? Adipisci atque nam nostrum nesciunt.
+        CLIENT
+        {JSON.stringify(user)}
       </Text>
 
       <TouchableOpacity>

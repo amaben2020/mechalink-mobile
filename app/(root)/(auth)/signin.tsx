@@ -7,7 +7,7 @@ import { fetchAPI } from '@/lib/fetch';
 import { z } from 'zod';
 import { signinSchema } from '@/schema/signup';
 import ErrorText from '@/components/ErrorText';
-import { useSignupStore } from '@/store/auth/get-user';
+import { useSignupStore, useUserStore } from '@/store/auth/get-user';
 
 export default function Signin() {
   const [form, setForm] = useState({
@@ -23,6 +23,8 @@ export default function Signin() {
   const [userRole, setUserRole] = useState('');
 
   const { setToken } = useSignupStore();
+
+  const { setUser } = useUserStore();
 
   const createUser = async () => {
     try {
@@ -48,6 +50,19 @@ export default function Signin() {
 
         setToken(data?.user?.stsTokenManager?.accessToken);
         setUserRole(data?.role);
+        setUser({
+          role: data?.role,
+          fullName: data?.fullName,
+          phoneNumber: data?.phoneNumber,
+          addressOne: data?.addressOne,
+          addressTwo: data?.addressTwo,
+          city: data?.city,
+          state: data?.state,
+          username: data?.username,
+          zip: data?.zip,
+          country: data?.country,
+          email: data?.email,
+        });
       }
 
       return data;
