@@ -32,20 +32,29 @@ export default function HomeScreen() {
 
       {/* cards of mechs and online availabilities */}
       <BottomSheet
-        snapPoints={['26%', '85%']}
+        snapPoints={['27%', '85%']}
         ref={bottomSheetRef}
         onChange={handleSheetChanges}
         style={{
           borderRadius: 10,
+          backgroundColor: 'F6F8FA',
         }}
       >
         <BottomSheetView
           style={{
             flex: 1,
-            padding: 40,
+            padding: 12,
           }}
         >
-          <Text>Awesome 🎉</Text>
+          <Text className="font-JakartaBold text-center text-xl">
+            Mechanics Near you
+          </Text>
+
+          <View className="flex flex-col border rounded-md p-8 mt-3">
+            <View>
+              <Text>Image</Text>
+            </View>
+          </View>
         </BottomSheetView>
       </BottomSheet>
     </GestureHandlerRootView>
