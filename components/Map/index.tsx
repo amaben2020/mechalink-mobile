@@ -42,8 +42,8 @@ export default function MapComponent() {
       // Start watching for location changes
       subscription = await Location.watchPositionAsync(
         {
-          accuracy: Location.Accuracy.High,
-          timeInterval: 1000,
+          accuracy: Location.Accuracy.Highest,
+          timeInterval: 10000,
           distanceInterval: 1,
         },
         (newLocation) => {
@@ -74,14 +74,11 @@ export default function MapComponent() {
     text = JSON.stringify(location);
   }
 
-  console.log('location', location);
-  console.log('error', errorMsg);
-
   return (
     <View style={styles.container}>
       <MapView
         region={region}
-        style={{ width: 600, height: 500 }}
+        style={{ width: 600, height: 700 }}
         provider={
           Platform.OS === 'android' ? PROVIDER_GOOGLE : PROVIDER_DEFAULT
         }
@@ -90,18 +87,30 @@ export default function MapComponent() {
         showsPointsOfInterest={false}
         showsUserLocation
         showsMyLocationButton
-        userInterfaceStyle="light"
+        userInterfaceStyle="dark"
         zoomEnabled
       >
         {location && (
-          <Marker
-            coordinate={{
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-            }}
-            title="Your Location"
-            description="You are here"
-          />
+          <>
+            <Marker
+              pinColor="green"
+              coordinate={{
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+              }}
+              title="Your Location"
+              description="You are here"
+            />
+            <Marker
+              pinColor="green"
+              coordinate={{
+                latitude: 8.98,
+                longitude: 7.6792,
+              }}
+              title="Your Location"
+              description="You are here"
+            />
+          </>
         )}
       </MapView>
     </View>
