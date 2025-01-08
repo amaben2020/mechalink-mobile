@@ -19,6 +19,7 @@ export default function Signin() {
   const [errors, setErrors] = useState<z.ZodFormattedError<typeof form> | null>(
     null
   );
+  const [isLoading, setIsLoading] = useState(false);
 
   const [userRole, setUserRole] = useState('');
 
@@ -27,6 +28,7 @@ export default function Signin() {
   const { setUser } = useUserStore();
 
   const createUser = async () => {
+    setIsLoading(true);
     try {
       const parsedForm = signinSchema.safeParse(form);
       if (!parsedForm.success) {
@@ -63,11 +65,13 @@ export default function Signin() {
           country: data?.country,
           email: data?.email,
         });
+        setIsLoading(false);
       }
 
       return data;
     } catch (error) {
       console.log(error);
+      setIsLoading(false);
     }
   };
 
@@ -103,14 +107,19 @@ export default function Signin() {
 
       {isSuccess && (
         <ModalComponent
-          url="/(root)/(client-tabs)/home"
+          url={
+            userRole.includes('client')
+              ? '/(root)/(client-tabs)/home'
+              : '/(root)/(tabs)/home'
+          }
           linkText={`Welcome ${userRole}`}
         />
       )}
 
       <TouchableOpacity
+        disabled={isLoading}
         onPress={createUser}
-        className="w-10/12 mx-auto p-4 bg-primary-500 rounded-full mt-5"
+        className="w-10/12 mx-auto p-4 bg-primary-500 rounded-full mt-5 disabled:bg-primary-300"
       >
         <Text className="text-white font-JakartaExtraBold text-center">
           Sign in
