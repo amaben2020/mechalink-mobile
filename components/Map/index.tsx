@@ -21,6 +21,7 @@ export default function MapComponent() {
   });
 
   useEffect(() => {
+    let subscription: Location.LocationSubscription | null = null;
     async function getCurrentLocation() {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
@@ -38,9 +39,32 @@ export default function MapComponent() {
         latitudeDelta: 0.05, // Smaller delta for a closer zoom
         longitudeDelta: 0.05,
       });
+      // Start watching for location changes
+      subscription = await Location.watchPositionAsync(
+        {
+          accuracy: Location.Accuracy.High,
+          timeInterval: 1000,
+          distanceInterval: 1,
+        },
+        (newLocation) => {
+          setLocation(newLocation);
+          setRegion({
+            latitude: newLocation.coords.latitude,
+            longitude: newLocation.coords.longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          });
+        }
+      );
     }
-
     getCurrentLocation();
+
+    // Cleanup subscription on component unmount
+    return () => {
+      if (subscription) {
+        subscription.remove();
+      }
+    };
   }, []);
 
   let text = 'Waiting...';
