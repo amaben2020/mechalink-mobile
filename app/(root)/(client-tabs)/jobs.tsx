@@ -1,13 +1,14 @@
-import { SafeAreaView, Text } from 'react-native';
+import ClientLayout from '@/components/layout/ClientLayout';
+import { Text, View } from 'react-native';
 
 export default function JobsScreen() {
   return (
-    <SafeAreaView>
-      <Text>
-        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Officiis iure
-        aperiam ut ex! Non tenetur nostrum quidem quam voluptas debitis earum
-        quos quis amet quasi? Adipisci atque nam nostrum nesciunt.
-      </Text>
-    </SafeAreaView>
+    <ClientLayout>
+      <Text className="font-JakartaBold text-center text-xl">Jobs</Text>
+
+      <View className="flex flex-col border rounded-md p-8 mt-3">
+        {/* Tab component for create and view */}
+      </View>
+    </ClientLayout>
   );
 }

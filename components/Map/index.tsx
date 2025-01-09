@@ -3,9 +3,16 @@ import MapView, {
   PROVIDER_GOOGLE,
   PROVIDER_DEFAULT,
   Marker,
+  Circle,
 } from 'react-native-maps';
-import { Platform, StyleSheet, View } from 'react-native';
-
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+// import { Picker } from '@react-native-picker/picker';
 import * as Location from 'expo-location';
 
 export default function MapComponent() {
@@ -20,8 +27,12 @@ export default function MapComponent() {
     longitudeDelta: 0.05,
   });
 
+  const [radius, setRadius] = useState<number>(1000);
+  const [mechanics, setMechanics] = useState<
+    Array<{ latitude: number; longitude: number; id: number }>
+  >([]);
+
   useEffect(() => {
-    let subscription: Location.LocationSubscription | null = null;
     async function getCurrentLocation() {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
@@ -29,63 +40,61 @@ export default function MapComponent() {
         return;
       }
 
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
+      let loc = await Location.getCurrentPositionAsync({});
+      setLocation(loc);
 
-      // Update map region to focus on user's location
       setRegion({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        latitudeDelta: 0.05, // Smaller delta for a closer zoom
-        longitudeDelta: 0.05,
+        latitude: loc.coords.latitude,
+        longitude: loc.coords.longitude,
+        latitudeDelta: 0.02,
+        longitudeDelta: 0.02,
       });
-      // Start watching for location changes
-      subscription = await Location.watchPositionAsync(
-        {
-          accuracy: Location.Accuracy.Highest,
-          timeInterval: 10000,
-          distanceInterval: 1,
-        },
-        (newLocation) => {
-          setLocation(newLocation);
-          setRegion({
-            latitude: newLocation.coords.latitude,
-            longitude: newLocation.coords.longitude,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-          });
-        }
-      );
     }
-    getCurrentLocation();
 
-    // Cleanup subscription on component unmount
-    return () => {
-      if (subscription) {
-        subscription.remove();
-      }
-    };
+    getCurrentLocation();
   }, []);
 
-  let text = 'Waiting...';
-  if (errorMsg) {
-    text = errorMsg;
-  } else if (location) {
-    text = JSON.stringify(location);
-  }
+  useEffect(() => {
+    if (location) {
+      generateMechanics();
+    }
+  }, [location, radius]);
+
+  const generateMechanics = () => {
+    if (!location) return;
+
+    const mechanicsList = [];
+    for (let i = 0; i < 4; i++) {
+      const randomOffset = () => (Math.random() - 0.5) * (radius / 100000); // Random offset based on radius
+      mechanicsList.push({
+        id: i,
+        latitude: location.coords.latitude + randomOffset(),
+        longitude: location.coords.longitude + randomOffset(),
+      });
+    }
+    setMechanics(mechanicsList);
+  };
+
+  // const radiusChangeHandler = (rad: number) => {
+  //   setRadius(rad);
+  // };
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity className="text-red-800 absolute top-[30%] left-2 z-10 bg-green-600 h-10">
+        {' '}
+        Change Radius
+      </TouchableOpacity>
       <MapView
         region={region}
-        style={{ width: 600, height: 800 }}
+        style={styles.map}
         provider={
           Platform.OS === 'android' ? PROVIDER_GOOGLE : PROVIDER_DEFAULT
         }
+        showsUserLocation
         tintColor="black"
         mapType={Platform.OS === 'android' ? 'standard' : 'mutedStandard'}
         showsPointsOfInterest={false}
-        showsUserLocation
         showsMyLocationButton
         userInterfaceStyle="dark"
         zoomEnabled
@@ -93,26 +102,53 @@ export default function MapComponent() {
         {location && (
           <>
             <Marker
-              pinColor="green"
               coordinate={{
                 latitude: location.coords.latitude,
                 longitude: location.coords.longitude,
               }}
               title="Your Location"
               description="You are here"
+              pinColor="blue"
             />
-            <Marker
-              pinColor="green"
-              coordinate={{
-                latitude: 8.98,
-                longitude: 7.6792,
+            <Circle
+              center={{
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
               }}
-              title="Your Location"
-              description="You are here"
+              radius={radius}
+              strokeWidth={2}
+              strokeColor="#00FF00"
+              fillColor="rgba(201, 242, 155, 0.2)"
             />
+            {mechanics.map((mechanic) => (
+              <Marker
+                key={mechanic.id}
+                coordinate={{
+                  latitude: mechanic.latitude,
+                  longitude: mechanic.longitude,
+                }}
+                title={`Mechanic ${mechanic.id + 1}`}
+                description="Nearby Mechanic"
+                pinColor="red"
+              />
+            ))}
           </>
         )}
       </MapView>
+      {/* TODO: readd radius picker later */}
+      {/* <View style={styles.radiusPickerContainer}>
+        <Text style={styles.radiusLabel}>Change Search Radius:</Text>
+        <Picker
+          selectedValue={radius}
+          style={styles.picker}
+          onValueChange={(itemValue) => radiusChangeHandler(Number(itemValue))}
+        >
+          <Picker.Item label="500m" value="500" />
+          <Picker.Item label="1Km" value="1000" />
+          <Picker.Item label="2Km" value="2000" />
+          <Picker.Item label="5Km" value="5000" />
+        </Picker>
+      </View> */}
     </View>
   );
 }
@@ -120,11 +156,34 @@ export default function MapComponent() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    height: '100%',
-    width: '100%',
+    position: 'relative',
   },
   map: {
     width: '100%',
     height: '100%',
+  },
+  radiusPickerContainer: {
+    position: 'absolute',
+    bottom: 320,
+    left: 10,
+    right: 10,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+  },
+  radiusLabel: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 5,
+    textAlign: 'center',
+  },
+  picker: {
+    height: 50,
+    width: '100%',
   },
 });
