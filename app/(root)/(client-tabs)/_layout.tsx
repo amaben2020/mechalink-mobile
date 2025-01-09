@@ -1,15 +1,14 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Image, ImageSourcePropType, Platform, View } from 'react-native';
+import { Platform, View } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { icons } from '@/constants/Icons';
 
 const TabIcon = ({
-  source,
   focused,
+  iconName,
 }: {
-  source: ImageSourcePropType;
   focused: boolean;
+  iconName: any;
 }) => (
   <View
     style={
@@ -32,11 +31,10 @@ const TabIcon = ({
         focused ? 'bg-general-400' : ''
       }`}
     >
-      <Image
-        source={source}
-        tintColor="white"
-        resizeMode="contain"
-        className="w-7 h-7 rounded"
+      <Ionicons
+        name={iconName ?? 'car'}
+        size={focused ? 24 : 32}
+        color={focused ? 'white' : 'green'}
       />
     </View>
   </View>
@@ -71,7 +69,7 @@ export default function TabLayout() {
           title: 'Home',
           headerShown: false,
           tabBarIcon: ({ focused }) => (
-            <TabIcon source={icons.home} focused={focused} />
+            <TabIcon focused={focused} iconName="home" />
           ),
         }}
       />
@@ -81,8 +79,7 @@ export default function TabLayout() {
           title: 'Jobs',
           headerShown: false,
           tabBarIcon: ({ focused }) => (
-            // <TabIcon source={icons.list} focused={focused} />
-            <Ionicons name="car" size={32} color="green" />
+            <TabIcon focused={focused} iconName="car" />
           ),
         }}
       />
@@ -92,7 +89,7 @@ export default function TabLayout() {
           title: 'Requests',
           headerShown: false,
           tabBarIcon: ({ focused }) => (
-            <TabIcon source={icons.list} focused={focused} />
+            <TabIcon focused={focused} iconName="list-outline" />
           ),
         }}
       />{' '}
@@ -102,7 +99,7 @@ export default function TabLayout() {
           title: 'Settings',
           headerShown: false,
           tabBarIcon: ({ focused }) => (
-            <TabIcon source={icons.list} focused={focused} />
+            <TabIcon focused={focused} iconName="settings-outline" />
           ),
         }}
       />{' '}

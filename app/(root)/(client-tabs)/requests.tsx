@@ -1,6 +1,6 @@
 import { SafeAreaView, Text } from 'react-native';
 
-export default function ExploreScreen() {
+export default function RequestsScreen() {
   return (
     <SafeAreaView>
       <Text>
