@@ -15,7 +15,7 @@ export default function HomeScreen() {
   }, []);
 
   return (
-    <GestureHandlerRootView style={{ flex: 1, height: 400 }}>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <MapComponent />
       {/* <Text>
         CLIENT

@@ -1,7 +1,7 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { Image, ImageSourcePropType, Platform, View } from 'react-native';
-
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { icons } from '@/constants/Icons';
 
 const TabIcon = ({
@@ -75,17 +75,37 @@ export default function TabLayout() {
           ),
         }}
       />
-
       <Tabs.Screen
-        name="explore"
+        name="jobs"
         options={{
-          title: 'Explore',
+          title: 'Jobs',
+          headerShown: false,
+          tabBarIcon: ({ focused }) => (
+            // <TabIcon source={icons.list} focused={focused} />
+            <Ionicons name="car" size={32} color="green" />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="requests"
+        options={{
+          title: 'Requests',
           headerShown: false,
           tabBarIcon: ({ focused }) => (
             <TabIcon source={icons.list} focused={focused} />
           ),
         }}
-      />
+      />{' '}
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Settings',
+          headerShown: false,
+          tabBarIcon: ({ focused }) => (
+            <TabIcon source={icons.list} focused={focused} />
+          ),
+        }}
+      />{' '}
     </Tabs>
   );
 }

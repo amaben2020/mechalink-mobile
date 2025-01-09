@@ -78,7 +78,7 @@ export default function MapComponent() {
     <View style={styles.container}>
       <MapView
         region={region}
-        style={{ width: 600, height: 700 }}
+        style={{ width: 600, height: 800 }}
         provider={
           Platform.OS === 'android' ? PROVIDER_GOOGLE : PROVIDER_DEFAULT
         }
