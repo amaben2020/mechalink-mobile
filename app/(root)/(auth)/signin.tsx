@@ -1,4 +1,11 @@
-import { Text, ScrollView, Image, View, TouchableOpacity } from 'react-native';
+import {
+  Text,
+  ScrollView,
+  Image,
+  View,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import React, { useState } from 'react';
 import { images } from '@/constants/Icons';
 import InputField from '@/components/InputField';
@@ -11,8 +18,8 @@ import { useSignupStore, useUserStore } from '@/store/auth/get-user';
 
 export default function Signin() {
   const [form, setForm] = useState({
-    password: ' ',
-    email: ' ',
+    password: 'Password123!',
+    email: 'amaben218phantom@gmail.com',
   });
 
   const [isSuccess, setIsSuccess] = useState(false);
@@ -31,6 +38,7 @@ export default function Signin() {
     setIsLoading(true);
     try {
       const parsedForm = signinSchema.safeParse(form);
+      console.log('parsed form', parsedForm);
       if (!parsedForm.success) {
         const newErrors = parsedForm.error.format();
         setErrors(newErrors);
@@ -91,7 +99,7 @@ export default function Signin() {
           placeholder="Enter a Email"
           onChangeText={(text) => setForm({ ...form, email: text })}
           textContentType="emailAddress"
-          value={form?.email.trim()}
+          value={'amaben218phantom@gmail.com'}
         />
         {errors?.email && <ErrorText message={errors.email?._errors[0]} />}
         <InputField
@@ -99,7 +107,7 @@ export default function Signin() {
           placeholder="Enter a Password i.e Password123!"
           onChangeText={(text) => setForm({ ...form, password: text })}
           secureTextEntry
-          value={form.password}
+          value={'Password123!'}
         />{' '}
         {errors?.password && (
           <ErrorText message={errors.password?._errors[0]} />
@@ -123,7 +131,11 @@ export default function Signin() {
         className="w-10/12 mx-auto p-4 bg-primary-500 rounded-full mt-5 disabled:bg-primary-300"
       >
         <Text className="text-white font-JakartaExtraBold text-center">
-          Sign in
+          {isLoading ? (
+            <ActivityIndicator className="mx-auto" size="large" color="#fff" />
+          ) : (
+            'Sign in'
+          )}
         </Text>
       </TouchableOpacity>
     </ScrollView>

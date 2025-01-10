@@ -6,6 +6,7 @@ import MapView, {
   Circle,
 } from 'react-native-maps';
 import {
+  ActivityIndicator,
   Platform,
   StyleSheet,
   Text,
@@ -15,6 +16,8 @@ import {
 // import { Picker } from '@react-native-picker/picker';
 import * as Location from 'expo-location';
 import { useUserLocationStore } from '../../store/location/location';
+import { fetchAPI } from '@/lib/fetch';
+import { useUserStore } from '@/store/auth/get-user';
 
 export default function MapComponent() {
   const [location, setLocation] = useState<Location.LocationObject | null>(
@@ -30,10 +33,46 @@ export default function MapComponent() {
 
   const { setLocation: setUserLocation } = useUserLocationStore();
 
-  const [radius, setRadius] = useState<number>(1000);
-  const [mechanics, setMechanics] = useState<
-    Array<{ latitude: number; longitude: number; id: number }>
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [radius, setRadius] = useState<number>(2000);
+
+  const [nearbyMechanics, s] = useState<
+    Array<{ lng: number; lat: string; id: string }>
   >([]);
+
+  const { user } = useUserStore();
+
+  const updateUserLocation = async (lat: number, long: number) => {
+    try {
+      setIsLoading(true);
+      const userId = user?.id;
+      if (!userId) throw new Error('User ID is missing.');
+
+      await fetchAPI(
+        `https://node-ci-cd-7.onrender.com/api/v1/users/user-location?userId=${userId}`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ latitude: lat, longitude: long }),
+        }
+      );
+
+      const mechanicsResponse = await fetchAPI(
+        `https://node-ci-cd-7.onrender.com/api/v1/nearby-mechanics?radius=${radius}&userId=${userId}`
+      );
+
+      s(mechanicsResponse?.nearbyMechs || []);
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      console.error(
+        'Error updating user location or fetching mechanics:',
+        error
+      );
+      setErrorMsg('Unable to update location or fetch nearby mechanics.');
+    }
+  };
 
   useEffect(() => {
     async function getCurrentLocation() {
@@ -55,35 +94,20 @@ export default function MapComponent() {
         latitudeDelta: 0.02,
         longitudeDelta: 0.02,
       });
+      await updateUserLocation(loc.coords.latitude, loc.coords.longitude);
     }
 
     getCurrentLocation();
   }, []);
 
-  useEffect(() => {
-    if (location) {
-      generateMechanics();
-    }
-  }, [location, radius]);
-
-  const generateMechanics = () => {
-    if (!location) return;
-
-    const mechanicsList = [];
-    for (let i = 0; i < 4; i++) {
-      const randomOffset = () => (Math.random() - 0.5) * (radius / 100000); // Random offset based on radius
-      mechanicsList.push({
-        id: i,
-        latitude: location.coords.latitude + randomOffset(),
-        longitude: location.coords.longitude + randomOffset(),
-      });
-    }
-    setMechanics(mechanicsList);
-  };
-
-  // const radiusChangeHandler = (rad: number) => {
-  //   setRadius(rad);
-  // };
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#00FF00" />
+        <Text>Loading map...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -126,18 +150,25 @@ export default function MapComponent() {
               strokeColor="#00FF00"
               fillColor="rgba(201, 242, 155, 0.2)"
             />
-            {mechanics?.map((mechanic) => (
-              <Marker
-                key={mechanic.id}
-                coordinate={{
-                  latitude: mechanic.latitude,
-                  longitude: mechanic.longitude,
-                }}
-                title={`Mechanic ${mechanic.id + 1}`}
-                description="Nearby Mechanic"
-                pinColor="red"
-              />
-            ))}
+
+            {!isLoading ? (
+              nearbyMechanics?.map((mechanic) => {
+                return (
+                  <Marker
+                    key={Number(mechanic.id)}
+                    coordinate={{
+                      latitude: parseFloat(mechanic.lat),
+                      longitude: parseFloat(mechanic.lng),
+                    }}
+                    title={`Mechanic ${mechanic?.id + 1}`}
+                    description="Nearby Mechanic"
+                    pinColor="green"
+                  />
+                );
+              })
+            ) : (
+              <Text>Loading...</Text>
+            )}
           </>
         )}
       </MapView>

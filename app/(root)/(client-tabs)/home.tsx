@@ -10,8 +10,6 @@ export default function HomeScreen() {
       </Text>
       {/* when you click the mechanics card, there is a request button, you make a request */}
 
-      {/* view nearby mechs by default with a radius around you */}
-
       <View className="flex flex-col border rounded-md p-8 mt-3">
         <View>
           <Text>Image</Text>

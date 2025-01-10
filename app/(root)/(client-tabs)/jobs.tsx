@@ -7,12 +7,19 @@ import { createJobSchema } from '@/schema/createJobSchema';
 import { useUserStore } from '@/store/auth/get-user';
 import { useUserLocationStore } from '@/store/location/location';
 import { useState } from 'react';
-import { Image, ScrollView, Text, View, TouchableOpacity } from 'react-native';
+import {
+  Image,
+  ScrollView,
+  Text,
+  View,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import { z } from 'zod';
 
 export default function JobsScreen() {
   const { user } = useUserStore();
-  console.log(user.id);
+  const [isLoading, setIsLoading] = useState(false);
   const { location } = useUserLocationStore();
   const [form, setForm] = useState({
     description: '',
@@ -31,14 +38,17 @@ export default function JobsScreen() {
   );
 
   const createJob = async () => {
+    setIsLoading(true);
     try {
       const parsedForm = createJobSchema.safeParse(form);
       console.log(parsedForm);
       if (!parsedForm.success) {
         const newErrors = parsedForm.error.format();
         setErrors(newErrors);
+        setIsLoading(false);
       } else {
         setErrors(null);
+        setIsLoading(false);
         console.log('Job created successfully:', form);
       }
 
@@ -51,7 +61,7 @@ export default function JobsScreen() {
       );
 
       if (data?.message.includes('created')) setIsSuccess(true);
-
+      setIsLoading(false);
       return data;
     } catch (error) {
       console.log(error);
@@ -81,7 +91,7 @@ export default function JobsScreen() {
             label="Rate"
             placeholder="Enter job rate"
             onChangeText={(text) => setForm({ ...form, rate: Number(text) })}
-            value={Number(form?.rate)}
+            value={String(form?.rate)}
             keyboardType="numeric"
           />
           {errors?.rate && <ErrorText message={errors.rate?._errors[0]} />}
@@ -100,7 +110,17 @@ export default function JobsScreen() {
             onPress={createJob}
             className="mt-5 bg-primary-500 rounded-full p-3"
           >
-            <Text className="text-center text-white">Create Job</Text>
+            <Text className="text-center text-white">
+              {isLoading ? (
+                <ActivityIndicator
+                  className="mx-auto text-center"
+                  size="large"
+                  color="#fff"
+                />
+              ) : (
+                'Create Job'
+              )}
+            </Text>
           </TouchableOpacity>
         </View>
 
