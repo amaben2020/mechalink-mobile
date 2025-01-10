@@ -34,6 +34,7 @@ type TUser = {
   username?: string;
   zip?: string;
   country?: string;
+  id?: string;
 };
 
 export type TUserStore = {

@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 // import { Picker } from '@react-native-picker/picker';
 import * as Location from 'expo-location';
+import { useUserLocationStore } from '../../store/location/location';
 
 export default function MapComponent() {
   const [location, setLocation] = useState<Location.LocationObject | null>(
@@ -23,9 +24,11 @@ export default function MapComponent() {
   const [region, setRegion] = useState({
     latitude: 9.0563,
     longitude: 7.4985,
-    latitudeDelta: 0.02,
-    longitudeDelta: 0.05,
+    latitudeDelta: 0.9,
+    longitudeDelta: 0.8,
   });
+
+  const { setLocation: setUserLocation } = useUserLocationStore();
 
   const [radius, setRadius] = useState<number>(1000);
   const [mechanics, setMechanics] = useState<
@@ -42,7 +45,10 @@ export default function MapComponent() {
 
       let loc = await Location.getCurrentPositionAsync({});
       setLocation(loc);
-
+      setUserLocation({
+        latitude: loc.coords.latitude,
+        longitude: loc.coords.longitude,
+      });
       setRegion({
         latitude: loc.coords.latitude,
         longitude: loc.coords.longitude,
@@ -120,7 +126,7 @@ export default function MapComponent() {
               strokeColor="#00FF00"
               fillColor="rgba(201, 242, 155, 0.2)"
             />
-            {mechanics.map((mechanic) => (
+            {mechanics?.map((mechanic) => (
               <Marker
                 key={mechanic.id}
                 coordinate={{
