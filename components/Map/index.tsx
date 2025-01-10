@@ -37,8 +37,8 @@ export default function MapComponent() {
 
   const [radius, setRadius] = useState<number>(2000);
 
-  const [nearbyMechanics, s] = useState<
-    Array<{ lng: number; lat: string; id: string }>
+  const [nearbyMechanics, setNearbyMechanics] = useState<
+    Array<{ lng: string; lat: string; id: string }>
   >([]);
 
   const { user } = useUserStore();
@@ -62,7 +62,7 @@ export default function MapComponent() {
         `https://node-ci-cd-7.onrender.com/api/v1/nearby-mechanics?radius=${radius}&userId=${userId}`
       );
 
-      s(mechanicsResponse?.nearbyMechs || []);
+      setNearbyMechanics(mechanicsResponse?.nearbyMechs || []);
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
@@ -154,16 +154,28 @@ export default function MapComponent() {
             {!isLoading ? (
               nearbyMechanics?.map((mechanic) => {
                 return (
-                  <Marker
-                    key={Number(mechanic.id)}
-                    coordinate={{
-                      latitude: parseFloat(mechanic.lat),
-                      longitude: parseFloat(mechanic.lng),
-                    }}
-                    title={`Mechanic ${mechanic?.id + 1}`}
-                    description="Nearby Mechanic"
-                    pinColor="green"
-                  />
+                  <>
+                    <Marker
+                      key={Number(mechanic.id)}
+                      coordinate={{
+                        latitude: parseFloat(mechanic.lat),
+                        longitude: parseFloat(mechanic.lng),
+                      }}
+                      title={`Mechanic ${mechanic?.id + 1}`}
+                      description="Nearby Mechanic"
+                      pinColor="green"
+                    />
+                    {/* <Callout>
+                      <View style={styles.calloutContainer}>
+                        <Text style={styles.calloutTitle}>
+                          Mechanic {mechanic?.id + 1}
+                        </Text>
+                        <Text style={styles.calloutDescription}>
+                          Nearby Mechanic
+                        </Text>
+                      </View>
+                    </Callout> */}
+                  </>
                 );
               })
             ) : (
@@ -222,5 +234,23 @@ const styles = StyleSheet.create({
   picker: {
     height: 50,
     width: '100%',
+  },
+  calloutContainer: {
+    padding: 10,
+    borderRadius: 8,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 150,
+  },
+  calloutTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 5,
+  },
+  calloutDescription: {
+    fontSize: 14,
+    color: '#666',
   },
 });
