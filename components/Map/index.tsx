@@ -18,6 +18,7 @@ import * as Location from 'expo-location';
 import { useUserLocationStore } from '../../store/location/location';
 import { fetchAPI } from '@/lib/fetch';
 import { useUserStore } from '@/store/auth/get-user';
+import { useMechanicsStore } from '@/store/mechanics/mechanics';
 
 export default function MapComponent() {
   const [location, setLocation] = useState<Location.LocationObject | null>(
@@ -36,6 +37,8 @@ export default function MapComponent() {
   const [isLoading, setIsLoading] = useState(false);
 
   const [radius, setRadius] = useState<number>(2000);
+
+  const { setMechanics } = useMechanicsStore();
 
   const [nearbyMechanics, setNearbyMechanics] = useState<
     Array<{ lng: string; lat: string; id: string }>
@@ -63,6 +66,7 @@ export default function MapComponent() {
       );
 
       setNearbyMechanics(mechanicsResponse?.nearbyMechs || []);
+      setMechanics(mechanicsResponse?.nearbyMechs || []);
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
