@@ -89,7 +89,7 @@ export default function TabLayout() {
           title: 'Requests',
           headerShown: false,
           tabBarIcon: ({ focused }) => (
-            <TabIcon focused={focused} iconName="list-outline" />
+            <TabIcon focused={focused} iconName="map-sharp" />
           ),
         }}
       />{' '}

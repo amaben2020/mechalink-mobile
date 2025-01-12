@@ -4,6 +4,13 @@ import * as SplashScreen from 'expo-splash-screen';
 import '../global.css';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
+import {
+  QueryClient,
+  QueryClientProvider,
+  focusManager,
+} from '@tanstack/react-query';
+import { AppStateStatus, Platform } from 'react-native';
+import { useOnlineManager, useAppState } from '@/hooks/useAppState';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -19,6 +26,19 @@ export default function RootLayout() {
     'Jakarta-SemiBold': require('../assets/fonts/PlusJakartaSans-SemiBold.ttf'),
   });
 
+  function onAppStateChange(status: AppStateStatus) {
+    if (Platform.OS !== 'web') {
+      focusManager.setFocused(status === 'active');
+    }
+  }
+
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: 2 } },
+  });
+
+  useOnlineManager();
+  useAppState(onAppStateChange);
+
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
@@ -30,10 +50,12 @@ export default function RootLayout() {
   }
 
   return (
-    <Stack>
-      <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="(root)" options={{ headerShown: false }} />
-      <Stack.Screen name="+not-found" />
-    </Stack>
+    <QueryClientProvider client={queryClient}>
+      <Stack>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="(root)" options={{ headerShown: false }} />
+        <Stack.Screen name="+not-found" />
+      </Stack>
+    </QueryClientProvider>
   );
 }

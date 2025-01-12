@@ -9,10 +9,12 @@ export type TMechanics = {
   distanceAway: number;
   jobCount: number;
   arrivalRate: number;
+  phone: number;
 };
 
 type TMechanicsStore = {
   mechanics: TMechanics[];
+  mechanic: TMechanics;
   setMechanics: (mechanics: TMechanics[]) => void;
   setMechanic: (mechanic: TMechanics) => void;
 };
@@ -21,13 +23,12 @@ export const useMechanicsStore = create<TMechanicsStore>()(
   devtools(
     persist(
       (set) => ({
-        mechanics: [], // Initialize as an empty array
+        mechanics: [],
+        mechanic: {},
         setMechanics: (mechanics: TMechanics[]) => set({ mechanics }),
         setMechanic: (mechanic: TMechanics) =>
           set((state) => ({
-            mechanics: state.mechanics.map((m) =>
-              m.id === mechanic.id ? mechanic : m
-            ),
+            mechanic: state.mechanics.find((m) => m.id === mechanic.id),
           })),
       }),
       {
