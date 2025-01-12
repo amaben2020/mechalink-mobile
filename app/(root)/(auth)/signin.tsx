@@ -34,11 +34,11 @@ export default function Signin() {
 
   const { setUser } = useUserStore();
 
-  const createUser = async () => {
+  const loginUser = async () => {
     setIsLoading(true);
     try {
       const parsedForm = signinSchema.safeParse(form);
-      console.log('parsed form', parsedForm);
+
       if (!parsedForm.success) {
         const newErrors = parsedForm.error.format();
         setErrors(newErrors);
@@ -127,12 +127,12 @@ export default function Signin() {
 
       <TouchableOpacity
         disabled={isLoading}
-        onPress={createUser}
+        onPress={loginUser}
         className="w-10/12 mx-auto p-4 bg-primary-500 rounded-full mt-5 disabled:bg-primary-300"
       >
         <Text className="text-white font-JakartaExtraBold text-center">
           {isLoading ? (
-            <ActivityIndicator className="mx-auto" size="large" color="#fff" />
+            <ActivityIndicator className="ml-20" size="large" color="#fff" />
           ) : (
             'Sign in'
           )}

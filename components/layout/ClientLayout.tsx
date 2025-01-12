@@ -29,7 +29,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
         ref={bottomSheetRef}
         onChange={handleSheetChanges}
         style={{
-          borderRadius: 10,
+          borderRadius: 24,
           backgroundColor: 'F6F8FA',
         }}
       >
@@ -37,6 +37,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
           style={{
             flex: 1,
             padding: 12,
+            borderRadius: 24,
           }}
         >
           {children}

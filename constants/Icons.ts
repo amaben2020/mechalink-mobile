@@ -76,23 +76,23 @@ export const icons = {
 export const onboarding = [
   {
     id: 1,
-    title: 'The perfect ride is just a tap away!',
+    title: 'The best mechanic is just a tap away!',
     description:
-      'Your journey begins with Ryde. Find your ideal ride effortlessly.',
+      'Your journey begins with Mechalink. Find your ideal mechanic effortlessly.',
     image: images.onboarding1,
   },
   {
     id: 2,
-    title: 'Best car in your hands with Ryde',
+    title: 'Best mechanic in your hands with Mechalink',
     description:
-      'Discover the convenience of finding your perfect ride with Ryde',
+      'Discover the convenience of finding your perfect mechanic with Mechalink',
     image: images.onboarding2,
   },
   {
     id: 3,
-    title: "Your ride, your way. Let's go!",
+    title: "Your mechanic, your way. Let's go!",
     description:
-      'Enter your destination, sit back, and let us take care of the rest.',
+      'Select a mechanic, sit back, and let us take care of the rest.',
     image: images.onboarding3,
   },
 ];
