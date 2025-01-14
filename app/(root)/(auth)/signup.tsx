@@ -44,16 +44,13 @@ export default function Signup() {
         console.log('Form submitted successfully:', form);
       }
 
-      const data = await fetchAPI(
-        'https://node-ci-cd-7.onrender.com/api/v1/auth/register',
-        {
-          method: 'POST',
-          body: JSON.stringify(parsedForm.data),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      const data = await fetchAPI('auth/register', {
+        method: 'POST',
+        body: JSON.stringify(parsedForm.data),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
       if (data?.message.includes('created')) setIsSuccess(true);
 

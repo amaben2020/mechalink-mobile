@@ -52,17 +52,14 @@ export default function MapComponent() {
       const userId = user?.id;
       if (!userId) throw new Error('User ID is missing.');
 
-      await fetchAPI(
-        `https://node-ci-cd-7.onrender.com/api/v1/users/user-location?userId=${userId}`,
-        {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ latitude: lat, longitude: long }),
-        }
-      );
+      await fetchAPI(`users/user-location?userId=${userId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ latitude: lat, longitude: long }),
+      });
 
       const mechanicsResponse = await fetchAPI(
-        `https://node-ci-cd-7.onrender.com/api/v1/nearby-mechanics?radius=${radius}&userId=${userId}`
+        `nearby-mechanics?radius=${radius}&userId=${userId}`
       );
 
       setNearbyMechanics(mechanicsResponse?.nearbyMechs || []);

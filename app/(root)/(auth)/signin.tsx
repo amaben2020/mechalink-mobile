@@ -47,13 +47,10 @@ export default function Signin() {
         console.log('Form submitted successfully:', form);
       }
 
-      const data = await fetchAPI(
-        'https://node-ci-cd-7.onrender.com/api/v1/auth/signin',
-        {
-          method: 'POST',
-          body: JSON.stringify(parsedForm.data),
-        }
-      );
+      const data = await fetchAPI('auth/signin', {
+        method: 'POST',
+        body: JSON.stringify(parsedForm.data),
+      });
 
       if (data?.user?.apiKey) {
         setIsSuccess(true);

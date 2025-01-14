@@ -35,7 +35,10 @@ export const useFetch = <T>(url: string, options?: RequestInit) => {
     setError(null);
 
     try {
-      const result = await fetchAPI(url, options);
+      const result = await fetchAPI(
+        `${process.env.EXPO_PUBLIC_BACKEND_API + url}`,
+        options
+      );
       setData(result.data);
     } catch (err) {
       setError((err as Error).message);

@@ -52,13 +52,10 @@ export default function JobsScreen() {
         console.log('Job created successfully:', form);
       }
 
-      const data = await fetchAPI(
-        'https://node-ci-cd-7.onrender.com/api/v1/jobs/jobs',
-        {
-          method: 'POST',
-          body: JSON.stringify(parsedForm.data),
-        }
-      );
+      const data = await fetchAPI('jobs/jobs', {
+        method: 'POST',
+        body: JSON.stringify(parsedForm.data),
+      });
 
       if (data?.message.includes('created')) setIsSuccess(true);
       setIsLoading(false);
