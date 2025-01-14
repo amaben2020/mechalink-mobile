@@ -87,6 +87,7 @@ export default function MapComponent() {
       }
 
       let loc = await Location.getCurrentPositionAsync({});
+
       setLocation(loc);
       setUserLocation({
         latitude: loc.coords.latitude,
