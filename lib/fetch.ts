@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 export const fetchAPI = async (url: string, options?: RequestInit) => {
   // use getState when you wanna opt out of hook
   const { token } = useSignupStore.getState();
+
   try {
     const response = await fetch(
       `${process.env.EXPO_PUBLIC_BACKEND_API + url}`,

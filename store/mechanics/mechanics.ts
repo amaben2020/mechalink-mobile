@@ -5,6 +5,7 @@ export type TMechanics = {
   lng: string;
   lat: string;
   id: string;
+  mechanicId: string;
   username: string;
   distanceAway: number;
   jobCount: number;
@@ -24,6 +25,7 @@ export const useMechanicsStore = create<TMechanicsStore>()(
     persist(
       (set) => ({
         mechanics: [],
+        //@ts-ignore
         mechanic: {},
         setMechanics: (mechanics: TMechanics[]) => set({ mechanics }),
         setMechanic: (mechanic: TMechanics) =>

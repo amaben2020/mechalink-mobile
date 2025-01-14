@@ -1,4 +1,6 @@
 import ClientLayout from '@/components/layout/ClientLayout';
+import { fetchAPI } from '@/lib/fetch';
+import { useUserLocationStore } from '@/store/location/location';
 import { useMechanicsStore } from '@/store/mechanics/mechanics';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
@@ -6,6 +8,7 @@ import { StarRatingDisplay } from 'react-native-star-rating-widget';
 
 export default function RequestsScreen() {
   const { mechanic, setMechanic } = useMechanicsStore();
+  const { location } = useUserLocationStore();
 
   // ensure the mech is the only one in he map
 
@@ -13,6 +16,35 @@ export default function RequestsScreen() {
 
   // todo: backend add mechanic and user image
   // update bvn and nimc
+
+  // there should be a dropdown where the jobs can be selected here
+  // update backend to have a mechanic id
+
+  const createJobRequestToMechanic = async () => {
+    if (!mechanic.id) throw new Error('Mechanic not selected');
+
+    try {
+      // TODO: refactor backend
+      const formData = {
+        jobId: 8,
+        distance: '7.8888,8.99999',
+        duration: '2 hours',
+        created_by: 'benoski',
+        lat: location.latitude,
+        lng: location.longitude,
+        mechanicId: Number(mechanic.mechanicId),
+      };
+      const result = await fetchAPI('jobRequests', {
+        method: 'POST',
+        body: JSON.stringify(formData),
+      });
+
+      console.log('result', result);
+      return result;
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <ClientLayout>
@@ -83,7 +115,10 @@ export default function RequestsScreen() {
         </View>
       </View>
 
-      <TouchableOpacity className="p-5 rounded-full bg-primary-500 mt-5">
+      <TouchableOpacity
+        onPress={createJobRequestToMechanic}
+        className="p-5 rounded-full bg-primary-500 mt-5"
+      >
         <Text className="text-white font-JakartaBold text-center">
           Create Job Request
         </Text>
