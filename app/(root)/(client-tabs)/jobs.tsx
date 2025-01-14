@@ -2,6 +2,7 @@ import ErrorText from '@/components/ErrorText';
 import InputField from '@/components/InputField';
 import ClientLayout from '@/components/layout/ClientLayout';
 import ModalComponent from '@/components/Modal';
+import { useCreateJob } from '@/hooks/services/jobs/useCreateJob';
 import { fetchAPI } from '@/lib/fetch';
 import { createJobSchema } from '@/schema/createJobSchema';
 import { useUserStore } from '@/store/auth/get-user';
@@ -19,7 +20,7 @@ import { z } from 'zod';
 
 export default function JobsScreen() {
   const { user } = useUserStore();
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
   const { location } = useUserLocationStore();
   const [form, setForm] = useState({
     description: '',
@@ -32,38 +33,44 @@ export default function JobsScreen() {
     userId: Number(user.id),
   });
 
-  const [isSuccess, setIsSuccess] = useState(false);
+  // const [isSuccess, setIsSuccess] = useState(false);
   const [errors, setErrors] = useState<z.ZodFormattedError<typeof form> | null>(
     null
   );
 
-  const createJob = async () => {
-    setIsLoading(true);
-    try {
-      const parsedForm = createJobSchema.safeParse(form);
-      console.log(parsedForm);
-      if (!parsedForm.success) {
-        const newErrors = parsedForm.error.format();
-        setErrors(newErrors);
-        setIsLoading(false);
-      } else {
-        setErrors(null);
-        setIsLoading(false);
-        console.log('Job created successfully:', form);
-      }
+  const { mutate: createJob, isPending: isLoading, isSuccess } = useCreateJob();
 
-      const data = await fetchAPI('jobs/jobs', {
-        method: 'POST',
-        body: JSON.stringify(parsedForm.data),
-      });
-
-      if (data?.message.includes('created')) setIsSuccess(true);
-      setIsLoading(false);
-      return data;
-    } catch (error) {
-      console.log(error);
-    }
+  const handleSubmit = () => {
+    createJob(form);
   };
+
+  // const createJob = async () => {
+  //   setIsLoading(true);
+  //   try {
+  //     const parsedForm = createJobSchema.safeParse(form);
+  //     console.log(parsedForm);
+  //     if (!parsedForm.success) {
+  //       const newErrors = parsedForm.error.format();
+  //       setErrors(newErrors);
+  //       setIsLoading(false);
+  //     } else {
+  //       setErrors(null);
+  //       setIsLoading(false);
+  //       console.log('Job created successfully:', form);
+  //     }
+
+  //     const data = await fetchAPI('jobs/jobs', {
+  //       method: 'POST',
+  //       body: JSON.stringify(parsedForm.data),
+  //     });
+
+  //     if (data?.message.includes('created')) setIsSuccess(true);
+  //     setIsLoading(false);
+  //     return data;
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
   return (
     <ClientLayout>
       <Text className="font-JakartaBold text-center text-xl">Jobs</Text>
@@ -104,7 +111,7 @@ export default function JobsScreen() {
           )}
 
           <TouchableOpacity
-            onPress={createJob}
+            onPress={() => handleSubmit()}
             className="mt-5 bg-primary-500 rounded-full p-3"
           >
             <Text className="text-center text-white">
