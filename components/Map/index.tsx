@@ -186,7 +186,8 @@ export default function MapComponent() {
 
   const [startCounter, setStartCounter] = useState(false);
 
-  console.log(distance);
+  //TODO: Timer is not controlled by user cos that stops when the mech approves or rejects a job
+  // TODO: When the timer stops, ensure the job request pane is opened and a message is displayed "Select another mechanic, we should have cancel later"
 
   useEffect(() => {
     if (testReq[0]?.id) {
