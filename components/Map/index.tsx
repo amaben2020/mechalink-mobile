@@ -24,6 +24,7 @@ import { useMechanicsStore } from '@/store/mechanics/mechanics';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Countdown from '../Countdown';
 import { useJobRequestStore } from '@/store/jobRequests/jobRequest';
+import { getDistance } from 'geolib'; // Import geolib for distance calculation
 
 // todo: ensure the selected mech is animated with the others removed
 // lets have the polygon glowing
@@ -370,15 +371,6 @@ export default function MapComponent() {
 
     getCurrentLocation();
   }, []);
-
-  const handleCountdownEnd = () => {
-    console.log('Countdown ended, triggering reassignment logic...');
-  };
-
-  const handleStop = () => {
-    console.log('Timer stopped, triggering reassignment logic...');
-  };
-
   const testReq = [
     {
       created_at: '2025-01-15T11:08:32.302Z',
@@ -394,8 +386,75 @@ export default function MapComponent() {
       userId: 15,
     },
   ];
+  const [distance, setDistance] = useState<number | null>(null); // State for distance
+
+  useEffect(() => {
+    if (testReq[0]?.mechanicId && location) {
+      const selectedMechanic = nearbyMechanics.find(
+        (mechanic) => mechanic.mechanicId === testReq[0]?.mechanicId
+      );
+
+      if (selectedMechanic) {
+        const userCoordinates = {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        };
+
+        const mechanicCoordinates = {
+          latitude: parseFloat(selectedMechanic.lat),
+          longitude: parseFloat(selectedMechanic.lng),
+        };
+
+        // Calculate the distance using geolib
+        const calculatedDistance = getDistance(
+          userCoordinates,
+          mechanicCoordinates
+        ); // Returns distance in meters
+        setDistance(calculatedDistance / 1000); // Convert to kilometers
+      }
+    }
+  }, [testReq[0]?.mechanicId, location, nearbyMechanics]);
+
+  useEffect(() => {
+    if (testReq[0]?.mechanicId && location) {
+      const selectedMechanic = nearbyMechanics.find(
+        (mechanic) => mechanic.mechanicId === testReq[0]?.mechanicId
+      );
+
+      if (selectedMechanic) {
+        const userCoordinates = {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        };
+
+        const mechanicCoordinates = {
+          latitude: parseFloat(selectedMechanic.lat),
+          longitude: parseFloat(selectedMechanic.lng),
+        };
+
+        // Zoom to both user and mechanic
+        mapRef.current.fitToCoordinates(
+          [userCoordinates, mechanicCoordinates],
+          {
+            edgePadding: { top: 100, right: 100, bottom: 100, left: 100 },
+            animated: true,
+          }
+        );
+      }
+    }
+  }, [nearbyMechanics, location]);
+
+  const handleCountdownEnd = () => {
+    console.log('Countdown ended, triggering reassignment logic...');
+  };
+
+  const handleStop = () => {
+    console.log('Timer stopped, triggering reassignment logic...');
+  };
 
   const [startCounter, setStartCounter] = useState(false);
+
+  console.log(distance);
 
   useEffect(() => {
     if (testReq[0]?.id) {
@@ -602,7 +661,11 @@ export default function MapComponent() {
                   coordinates={[userCoords, mechanicCoords]}
                   strokeColor="#00FF00"
                   strokeWidth={3}
-                />
+                >
+                  <View>
+                    <Text>{distance} meters</Text>
+                  </View>
+                </Polyline>
               );
             }
             return null;
