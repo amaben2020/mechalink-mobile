@@ -21,6 +21,7 @@ import { useUserStore } from '@/store/auth/get-user';
 import { useMechanicsStore } from '@/store/mechanics/mechanics';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Countdown from '../Countdown';
+import { useJobRequestStore } from '@/store/jobRequests/jobRequest';
 
 export default function MapComponent() {
   const [location, setLocation] = useState<Location.LocationObject | null>(
@@ -47,6 +48,10 @@ export default function MapComponent() {
   >([]);
 
   const { user } = useUserStore();
+
+  const { jobRequest } = useJobRequestStore();
+
+  console.log('job request', jobRequest);
 
   const updateUserLocation = async (lat: number, long: number) => {
     try {
@@ -143,17 +148,22 @@ export default function MapComponent() {
         userInterfaceStyle="dark"
         zoomEnabled
       >
-        <View style={styles.cunt}>
-          <Text>Waiting for Mechanic name to accept job</Text>
-          <View className="flex flex-row items-center border">
-            <Ionicons name="time-sharp" size={40} color="white" />
-            <Countdown
-              minutes={10} // Start with 10 minutes
-              onCountdownEnd={handleCountdownEnd}
-              onStop={handleStop}
-            />
+        {jobRequest[0]?.id && (
+          <View style={styles.cunt}>
+            <Text>
+              Waiting for Mechanic name to accept job
+              {JSON.stringify(jobRequest)}
+            </Text>
+            <View className="flex flex-row items-center border">
+              <Ionicons name="time-sharp" size={40} color="white" />
+              <Countdown
+                minutes={10} // Start with 10 minutes
+                onCountdownEnd={handleCountdownEnd}
+                onStop={handleStop}
+              />
+            </View>
           </View>
-        </View>
+        )}
         {location && (
           <>
             <Marker

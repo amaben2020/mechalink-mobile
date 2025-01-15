@@ -13,7 +13,7 @@ const Countdown: React.FC<CountdownProps> = ({
   onCountdownEnd,
   onStop,
 }) => {
-  const [timeLeft, setTimeLeft] = useState(minutes * 60); // Time left in seconds
+  const [timeLeft, setTimeLeft] = useState(minutes * 60);
   const [isRunning, setIsRunning] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -36,7 +36,7 @@ const Countdown: React.FC<CountdownProps> = ({
             clearInterval(intervalRef.current as NodeJS.Timeout);
             setIsRunning(false);
             onCountdownEnd();
-            AsyncStorage.removeItem(TIMER_KEY); // Clear storage
+            AsyncStorage.removeItem(TIMER_KEY);
             return 0;
           }
 
@@ -103,7 +103,7 @@ const Countdown: React.FC<CountdownProps> = ({
     loadTimerState();
 
     return () => {
-      clearInterval(intervalRef.current as NodeJS.Timeout); // Cleanup on unmount
+      clearInterval(intervalRef.current as NodeJS.Timeout);
     };
   }, []);
 

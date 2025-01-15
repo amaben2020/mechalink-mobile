@@ -1,5 +1,6 @@
 import ClientLayout from '@/components/layout/ClientLayout';
 import { fetchAPI } from '@/lib/fetch';
+import { useJobRequestStore } from '@/store/jobRequests/jobRequest';
 import { useUserLocationStore } from '@/store/location/location';
 import { useMechanicsStore } from '@/store/mechanics/mechanics';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -11,10 +12,8 @@ export default function RequestsScreen() {
   const { mechanic, setMechanic } = useMechanicsStore();
   const { location } = useUserLocationStore();
   const [hasMadeRequest, setHasMadeRequest] = useState([]);
-
+  const { setJobRequest } = useJobRequestStore();
   // ensure the mech is the only one in he map
-
-  // reduce the height of the drawer
 
   // todo: backend add mechanic and user image
   // update bvn and nimc
@@ -42,6 +41,7 @@ export default function RequestsScreen() {
       });
 
       setHasMadeRequest(result.jobRequest);
+      setJobRequest(result.jobRequest);
       return result;
     } catch (error) {
       console.log(error);
