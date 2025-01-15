@@ -5,6 +5,7 @@ import MapView, {
   Marker,
   Circle,
   Callout,
+  Polyline,
 } from 'react-native-maps';
 import {
   ActivityIndicator,
@@ -574,6 +575,33 @@ export default function MapComponent() {
                   strokeWidth={2}
                   strokeColor="orange"
                   fillColor="rgba(255, 165, 0, 0.2)" // Glowing effect
+                />
+              );
+            }
+            return null;
+          })}
+
+        {/* Draw Line between User and Mechanic */}
+        {location &&
+          testReq[0]?.mechanicId &&
+          nearbyMechanics.map((mechanic) => {
+            if (mechanic.mechanicId === testReq[0]?.mechanicId) {
+              const mechanicCoords = {
+                latitude: parseFloat(mechanic.lat),
+                longitude: parseFloat(mechanic.lng),
+              };
+
+              const userCoords = {
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+              };
+
+              return (
+                <Polyline
+                  key="line"
+                  coordinates={[userCoords, mechanicCoords]}
+                  strokeColor="#00FF00"
+                  strokeWidth={3}
                 />
               );
             }
