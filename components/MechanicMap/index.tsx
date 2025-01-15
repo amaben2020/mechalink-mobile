@@ -15,18 +15,16 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-// import { Picker } from '@react-native-picker/picker';
 import * as Location from 'expo-location';
 import { useUserLocationStore } from '../../store/location/location';
 import { fetchAPI } from '@/lib/fetch';
 import { useUserStore } from '@/store/auth/get-user';
-import { useMechanicsStore } from '@/store/mechanics/mechanics';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Countdown from '../Countdown';
-import { useJobRequestStore } from '@/store/jobRequests/jobRequest';
+
 import { getDistance } from 'geolib'; // Import geolib for distance calculation
 
-export default function MapComponent() {
+export default function MechanicMapComponent() {
   const [location, setLocation] = useState<Location.LocationObject | null>(
     null
   );
@@ -38,15 +36,15 @@ export default function MapComponent() {
     longitudeDelta: 0.8,
   });
 
-  const { setLocation: setUserLocation } = useUserLocationStore();
+  const { setLocation: setMechanicLocation } = useUserLocationStore();
   const [isLoading, setIsLoading] = useState(false);
   const [radius, setRadius] = useState<number>(2000);
-  const { setMechanics } = useMechanicsStore();
+  const [jobRequestLocation, setJobRequestLocation] = useState({});
+
   const [nearbyMechanics, setNearbyMechanics] = useState<
     Array<{ lng: string; lat: string; id: string }>
   >([]);
   const { user } = useUserStore();
-  const { jobRequest } = useJobRequestStore();
 
   const updateUserLocation = async (lat: number, long: number) => {
     try {
@@ -54,18 +52,12 @@ export default function MapComponent() {
       const userId = user?.id;
       if (!userId) throw new Error('User ID is missing.');
 
-      await fetchAPI(`users/user-location?userId=${userId}`, {
-        method: 'PUT',
+      const response = await fetchAPI(`jobRequests/17`, {
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ latitude: lat, longitude: long }),
       });
 
-      const mechanicsResponse = await fetchAPI(
-        `nearby-mechanics?radius=${radius}&userId=${userId}`
-      );
+      setJobRequestLocation(response);
 
-      setNearbyMechanics(mechanicsResponse?.nearbyMechs || []);
-      setMechanics(mechanicsResponse?.nearbyMechs || []);
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
@@ -88,7 +80,7 @@ export default function MapComponent() {
       let loc = await Location.getCurrentPositionAsync({});
 
       setLocation(loc);
-      setUserLocation({
+      setMechanicLocation({
         latitude: loc.coords.latitude,
         longitude: loc.coords.longitude,
       });
@@ -103,38 +95,20 @@ export default function MapComponent() {
 
     getCurrentLocation();
   }, []);
-  const testReq = [
-    {
-      created_at: '2025-01-15T11:08:32.302Z',
-      created_by: '15',
-      distance: '7.8888,8.99999',
-      duration: '2 hours',
-      id: 37,
-      jobId: 8,
-      mechanicId: 17,
-      status: 'NOTIFYING', // use this to hide or show timer
-      updated_at: null,
-      updated_by: null,
-      userId: 15,
-    },
-  ];
+
   const [distance, setDistance] = useState<number | null>(null); // State for distance
 
   useEffect(() => {
-    if (testReq[0]?.mechanicId && location) {
-      const selectedMechanic = nearbyMechanics.find(
-        (mechanic) => mechanic.mechanicId === testReq[0]?.mechanicId
-      );
-
-      if (selectedMechanic) {
+    if (jobRequestLocation && location) {
+      if (jobRequestLocation?.location?.latitude) {
         const userCoordinates = {
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
         };
 
         const mechanicCoordinates = {
-          latitude: parseFloat(selectedMechanic.lat),
-          longitude: parseFloat(selectedMechanic.lng),
+          latitude: parseFloat(jobRequestLocation?.location?.latitude),
+          longitude: parseFloat(jobRequestLocation?.location?.latitude),
         };
 
         // Calculate the distance using geolib
@@ -145,23 +119,19 @@ export default function MapComponent() {
         setDistance(calculatedDistance / 1000); // Convert to kilometers
       }
     }
-  }, [testReq[0]?.mechanicId, location, nearbyMechanics]);
+  }, [jobRequestLocation, location, nearbyMechanics]);
 
   useEffect(() => {
-    if (testReq[0]?.mechanicId && location) {
-      const selectedMechanic = nearbyMechanics.find(
-        (mechanic) => mechanic.mechanicId === testReq[0]?.mechanicId
-      );
-
-      if (selectedMechanic) {
+    if (jobRequestLocation && location) {
+      if (jobRequestLocation?.location?.latitude) {
         const userCoordinates = {
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
         };
 
         const mechanicCoordinates = {
-          latitude: parseFloat(selectedMechanic.lat),
-          longitude: parseFloat(selectedMechanic.lng),
+          latitude: parseFloat(jobRequestLocation?.location?.latitude),
+          longitude: parseFloat(jobRequestLocation?.location?.latitude),
         };
 
         // Zoom to both user and mechanic
@@ -189,37 +159,25 @@ export default function MapComponent() {
   //TODO: Timer is not controlled by user cos that stops when the mech approves or rejects a job
   // TODO: When the timer stops, ensure the job request pane is opened and a message is displayed "Select another mechanic, we should have cancel later"
 
-  useEffect(() => {
-    if (testReq[0]?.id) {
-      setStartCounter(true);
-    } else {
-      setStartCounter(false);
-    }
-  }, [testReq[0]?.id]);
-
   const mapRef = useRef<any>(undefined);
 
   useEffect(() => {
-    if (mapRef.current && testReq[0]?.mechanicId) {
-      const selectedMechanic = nearbyMechanics.find(
-        (mechanic) => mechanic.mechanicId === testReq[0]?.mechanicId
-      );
-
-      if (selectedMechanic && location) {
+    if (mapRef.current && jobRequestLocation) {
+      if (location) {
         // Coordinates for both user and mechanic
         const userCoordinates = {
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
         };
 
-        const mechanicCoordinates = {
-          latitude: parseFloat(selectedMechanic.lat),
-          longitude: parseFloat(selectedMechanic.lng),
+        const jobRequestCoordinate = {
+          latitude: parseFloat(jobRequestLocation?.location?.latitude),
+          longitude: parseFloat(jobRequestLocation?.location?.longitude),
         };
 
         // Fit the map to both the user and mechanic locations
         mapRef.current.fitToCoordinates(
-          [userCoordinates, mechanicCoordinates],
+          [userCoordinates, jobRequestCoordinate],
           {
             edgePadding: { top: 100, right: 100, bottom: 100, left: 100 },
             animated: true,
@@ -227,7 +185,9 @@ export default function MapComponent() {
         );
       }
     }
-  }, [nearbyMechanics, testReq[0]?.mechanicId, location]);
+  }, [nearbyMechanics, jobRequestLocation, location]);
+
+  console.log('location', location);
 
   return (
     <View style={styles.container}>
@@ -249,19 +209,22 @@ export default function MapComponent() {
         userInterfaceStyle="dark"
         zoomEnabled
       >
-        {testReq[0]?.id && (
+        {jobRequestLocation && (
           <View style={styles.cunt}>
             <Text>
               Waiting for Mechanic name to accept job from {distance} km away
             </Text>
-            <View className="flex flex-row items-center border">
-              <Ionicons name="time-sharp" size={40} color="white" />
-              <Countdown
-                minutes={10} // Start with 10 minutes
-                onCountdownEnd={handleCountdownEnd}
-                onStop={handleStop}
-                startCounter={startCounter}
-              />
+            <View className="flex flex-row items-center">
+              <Text>Do you want to accept the job?</Text>
+
+              <TouchableOpacity className="bg-green-600 p-4 ">
+                <Text className="text-white font-JakartaBold p-4">Yes</Text>
+              </TouchableOpacity>
+              <TouchableOpacity className="bg-red-600 text-white font-JakartaBold p-4">
+                <Text className="bg-red-600 text-white font-JakartaBold p-4">
+                  No
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
         )}
@@ -272,9 +235,9 @@ export default function MapComponent() {
                 latitude: location.coords.latitude,
                 longitude: location.coords.longitude,
               }}
-              title="Your Location"
+              title="Your Location (mechanic)"
               description="You are here"
-              pinColor="blue"
+              pinColor="green"
             />
             <Circle
               center={{
@@ -287,94 +250,62 @@ export default function MapComponent() {
               fillColor="rgba(201, 242, 155, 0.2)"
             />
 
-            {!isLoading ? (
-              nearbyMechanics.map((mechanic) => {
-                return (
-                  <Marker
-                    identifier={testReq[0]?.mechanicId}
-                    key={mechanic.id}
-                    coordinate={{
-                      latitude: parseFloat(mechanic.lat),
-                      longitude: parseFloat(mechanic.lng),
-                    }}
-                    title={`Mechanic ${mechanic?.id + 1}`}
-                    description="Nearby Mechanic"
-                    pinColor={
-                      mechanic.mechanicId === testReq[0]?.mechanicId
-                        ? 'orange'
-                        : 'black'
-                    }
-                  >
-                    <Callout>
-                      <View>
-                        <Text>Mechanic {mechanic?.id + 1}</Text>
-                        <Text>
-                          {mechanic?.mechanicId === testReq[0]?.mechanicId
-                            ? 'Selected'
-                            : 'Nearby'}{' '}
-                          Mechanic
-                        </Text>
-                      </View>
-                    </Callout>
-                  </Marker>
-                );
-              })
+            {true ? (
+              <Marker
+                // identifier={jobRequestLocation}
+                // key={mechanic.id}
+                coordinate={{
+                  latitude: jobRequestLocation?.location?.latitude,
+                  longitude: jobRequestLocation?.location?.longitude,
+                }}
+                title={`Job`}
+                description="Nearby User"
+                pinColor={'black'}
+              >
+                <Callout>
+                  <View>
+                    <Text>User </Text>
+                    <Text>User</Text>
+                  </View>
+                </Callout>
+              </Marker>
             ) : (
               <Text>Loading...</Text>
             )}
           </>
         )}
         {/* Glowing Circle for Mechanic */}
-        {testReq[0]?.mechanicId &&
-          nearbyMechanics.map((mechanic) => {
-            if (mechanic.mechanicId === testReq[0]?.mechanicId) {
-              return (
-                <Circle
-                  key={`mechanic-${mechanic.id}`}
-                  center={{
-                    latitude: parseFloat(mechanic.lat),
-                    longitude: parseFloat(mechanic.lng),
-                  }}
-                  radius={radius}
-                  strokeWidth={2}
-                  strokeColor="orange"
-                  fillColor="rgba(255, 165, 0, 0.2)" // Glowing effect
-                />
-              );
-            }
-            return null;
-          })}
+        <Circle
+          key={`mechanic`}
+          center={{
+            latitude: jobRequestLocation.location.latitude,
+            longitude: jobRequestLocation.location.longitude,
+          }}
+          radius={10}
+          strokeWidth={20}
+          strokeColor="orange"
+          fillColor="rgba(255, 165, 0, 0.2)" // Glowing effect
+        />
 
         {/* Draw Line between User and Mechanic */}
-        {location &&
-          testReq[0]?.mechanicId &&
-          nearbyMechanics.map((mechanic) => {
-            if (mechanic.mechanicId === testReq[0]?.mechanicId) {
-              const mechanicCoords = {
-                latitude: parseFloat(mechanic.lat),
-                longitude: parseFloat(mechanic.lng),
-              };
-
-              const userCoords = {
-                latitude: location.coords.latitude,
+        {location && jobRequestLocation && (
+          <Polyline
+            key="line"
+            coordinates={[
+              {
                 longitude: location.coords.longitude,
-              };
-
-              return (
-                <Polyline
-                  key="line"
-                  coordinates={[userCoords, mechanicCoords]}
-                  strokeColor="#00FF00"
-                  strokeWidth={3}
-                >
-                  <View>
-                    <Text>{distance} meters</Text>
-                  </View>
-                </Polyline>
-              );
-            }
-            return null;
-          })}
+                latitude: location.coords.latitude,
+              },
+              jobRequestLocation.location,
+            ]}
+            strokeColor="#FF0000"
+            strokeWidth={10}
+          >
+            <View>
+              <Text>{distance} meters</Text>
+            </View>
+          </Polyline>
+        )}
       </MapView>
     </View>
   );

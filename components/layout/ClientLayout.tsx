@@ -5,13 +5,16 @@ import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import React, { ReactNode, useCallback, useRef } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import MechanicMapComponent from '../MechanicMap';
 
 export default function ClientLayout({
   children,
   breakPoints,
+  variant,
 }: {
   children: ReactNode;
   breakPoints?: string[] | undefined;
+  variant?: 'mechanic' | 'client';
 }) {
   const { user } = useUserStore();
   const bottomSheetRef = useRef<BottomSheet>(null);
@@ -22,7 +25,11 @@ export default function ClientLayout({
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <MapComponent />
+      {variant === 'client' || !variant ? (
+        <MapComponent />
+      ) : (
+        <MechanicMapComponent />
+      )}
 
       <TouchableOpacity>
         <Link href="/(root)/about" className="text-red-900 p-3">
