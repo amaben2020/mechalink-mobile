@@ -250,7 +250,9 @@ export default function MapComponent() {
       >
         {testReq[0]?.id && (
           <View style={styles.cunt}>
-            <Text>Waiting for Mechanic name to accept job</Text>
+            <Text>
+              Waiting for Mechanic name to accept job from {distance} km away
+            </Text>
             <View className="flex flex-row items-center border">
               <Ionicons name="time-sharp" size={40} color="white" />
               <Countdown
