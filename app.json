@@ -54,6 +54,17 @@
         {
           "locationAlwaysAndWhenInUsePermission": "Allow Mechalink to use your location."
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/react-logo@3x.png",
+          "color": "#ffffff",
+          "sounds": [
+            "./local/path/to/mySound.wav",
+            "./local/path/to/myOtherSound.wav"
+          ]
+        }
       ]
     ],
     "experiments": {

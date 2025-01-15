@@ -3,12 +3,14 @@ import { fetchAPI } from '@/lib/fetch';
 import { useUserLocationStore } from '@/store/location/location';
 import { useMechanicsStore } from '@/store/mechanics/mechanics';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useState } from 'react';
 import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
 
 export default function RequestsScreen() {
   const { mechanic, setMechanic } = useMechanicsStore();
   const { location } = useUserLocationStore();
+  const [hasMadeRequest, setHasMadeRequest] = useState([]);
 
   // ensure the mech is the only one in he map
 
@@ -39,7 +41,7 @@ export default function RequestsScreen() {
         body: JSON.stringify(formData),
       });
 
-      console.log('result', result);
+      setHasMadeRequest(result.jobRequest);
       return result;
     } catch (error) {
       console.log(error);
@@ -47,7 +49,9 @@ export default function RequestsScreen() {
   };
 
   return (
-    <ClientLayout>
+    <ClientLayout
+      breakPoints={hasMadeRequest.length > 0 ? ['18%', '30%'] : undefined}
+    >
       {/* <Text>Job Request and History {mechanic.username}</Text> */}
       {/* <Text>{JSON.stringify(mechanic)}</Text> */}
 
@@ -118,6 +122,7 @@ export default function RequestsScreen() {
       <TouchableOpacity
         onPress={createJobRequestToMechanic}
         className="p-5 rounded-full bg-primary-500 mt-5"
+        disabled={hasMadeRequest.length > 0}
       >
         <Text className="text-white font-JakartaBold text-center">
           Create Job Request

@@ -6,7 +6,13 @@ import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import React, { ReactNode, useCallback, useRef } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-export default function ClientLayout({ children }: { children: ReactNode }) {
+export default function ClientLayout({
+  children,
+  breakPoints,
+}: {
+  children: ReactNode;
+  breakPoints?: string[] | undefined;
+}) {
   const { user } = useUserStore();
   const bottomSheetRef = useRef<BottomSheet>(null);
 
@@ -25,7 +31,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
       </TouchableOpacity>
 
       <BottomSheet
-        snapPoints={['27%', '85%']}
+        snapPoints={breakPoints || ['27%', '85%']}
         ref={bottomSheetRef}
         onChange={handleSheetChanges}
         style={{

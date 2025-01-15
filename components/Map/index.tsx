@@ -19,6 +19,8 @@ import { useUserLocationStore } from '../../store/location/location';
 import { fetchAPI } from '@/lib/fetch';
 import { useUserStore } from '@/store/auth/get-user';
 import { useMechanicsStore } from '@/store/mechanics/mechanics';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import Countdown from '../Countdown';
 
 export default function MapComponent() {
   const [location, setLocation] = useState<Location.LocationObject | null>(
@@ -111,6 +113,16 @@ export default function MapComponent() {
     );
   }
 
+  const handleCountdownEnd = () => {
+    console.log('Countdown ended, triggering reassignment logic...');
+    // Trigger the reassignment logic here
+  };
+
+  const handleStop = () => {
+    console.log('Timer stopped, triggering reassignment logic...');
+    // Trigger the reassignment logic here
+  };
+
   return (
     <View style={styles.container}>
       <TouchableOpacity className="text-red-800 absolute top-[30%] left-2 z-10 bg-green-600 h-10">
@@ -131,6 +143,17 @@ export default function MapComponent() {
         userInterfaceStyle="dark"
         zoomEnabled
       >
+        <View style={styles.cunt}>
+          <Text>Waiting for Mechanic name to accept job</Text>
+          <View className="flex flex-row items-center border">
+            <Ionicons name="time-sharp" size={40} color="white" />
+            <Countdown
+              minutes={10} // Start with 10 minutes
+              onCountdownEnd={handleCountdownEnd}
+              onStop={handleStop}
+            />
+          </View>
+        </View>
         {location && (
           <>
             <Marker
@@ -205,6 +228,21 @@ export default function MapComponent() {
 }
 
 const styles = StyleSheet.create({
+  cunt: {
+    backgroundColor: '#FFA500',
+    position: 'absolute',
+    top: 50,
+    left: '20%',
+    transform: [{ translateX: -0.5 * (80 / 100) * 100 }], // 4/5 width = 80%
+    width: '80%',
+    padding: 15,
+    borderRadius: 15,
+    elevation: 4, // Adds shadow for Android
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
   container: {
     flex: 1,
     position: 'relative',
