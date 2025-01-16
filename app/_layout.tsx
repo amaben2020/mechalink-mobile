@@ -11,6 +11,7 @@ import {
 } from '@tanstack/react-query';
 import { AppStateStatus, Platform } from 'react-native';
 import { useOnlineManager, useAppState } from '@/hooks/useAppState';
+import { Audio } from 'expo-av';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -37,7 +38,63 @@ export default function RootLayout() {
   });
 
   useOnlineManager();
-  useAppState(onAppStateChange);
+  // useAppState(onAppStateChange);
+  // useEffect(() => {
+  //   let sound: any;
+
+  //   const playSound = async () => {
+  //     sound = new Audio.Sound();
+  //     try {
+  //       await sound.loadAsync(require('./../assets/start.wav'));
+  //       await sound.playAsync();
+  //     } catch (error) {
+  //       console.error('Error playing sound', error);
+  //     }
+  //   };
+
+  //   playSound();
+
+  //   return () => {
+  //     // Cleanup the sound instance
+  //     if (sound) {
+  //       sound.unloadAsync();
+  //     }
+  //   };
+  // }, []);
+
+  useEffect(() => {
+    let sound: Audio.Sound | null = null;
+
+    const playSoundAndHideSplash = async () => {
+      try {
+        sound = new Audio.Sound();
+        await sound.loadAsync(require('./../assets/start.wav'));
+        await sound.playAsync();
+
+        // Wait for the sound to finish playing or hide the splash screen after a delay
+        sound.setOnPlaybackStatusUpdate(async (status) => {
+          //@ts-ignore
+          if (status?.didJustFinish) {
+            await SplashScreen.hideAsync(); // Hide the splash screen after sound finishes
+          }
+        });
+      } catch (error) {
+        console.error('Error playing sound', error);
+        // Ensure the splash screen hides even if sound fails
+        await SplashScreen.hideAsync();
+      }
+    };
+
+    playSoundAndHideSplash();
+
+    return () => {
+      // Cleanup the sound instance
+      if (sound) {
+        sound.unloadAsync();
+        sound = null;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (loaded) {
