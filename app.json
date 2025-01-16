@@ -60,10 +60,7 @@
         {
           "icon": "./assets/images/react-logo@3x.png",
           "color": "#ffffff",
-          "sounds": [
-            "./local/path/to/mySound.wav",
-            "./local/path/to/myOtherSound.wav"
-          ]
+          "sounds": ["./assets/rev.mp3", "./assets/start.wav"]
         }
       ]
     ],
