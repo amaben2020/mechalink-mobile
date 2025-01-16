@@ -43,7 +43,7 @@ export default function MechanicMapComponent() {
   const [isLoading, setIsLoading] = useState(false);
   const [radius, setRadius] = useState<number>(2000);
   const [jobRequestLocation, setJobRequestLocation] = useState<any>({});
-
+  console.log(jobRequestLocation);
   const [nearbyMechanics, setNearbyMechanics] = useState<
     Array<{ lng: string; lat: string; id: string }>
   >([]);
@@ -201,7 +201,9 @@ export default function MechanicMapComponent() {
     }
   }, [jobRequestLocation.status]);
 
-  console.log('jobRequestLocation', jobRequestLocation);
+  if (isLoading) {
+    return <Text>Loading...</Text>;
+  }
 
   return (
     <View style={styles.container}>

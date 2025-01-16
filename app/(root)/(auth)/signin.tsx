@@ -20,7 +20,7 @@ export default function Signin() {
   const [form, setForm] = useState({
     password: 'Password123!',
     // email: 'amaben218phantom@gmail.com',
-    email: 'amaben203phantom@gmail.com',
+    email: 'amaben218phantom@gmail.com',
   });
 
   const [isSuccess, setIsSuccess] = useState(false);
@@ -98,7 +98,7 @@ export default function Signin() {
           placeholder="Enter a Email"
           onChangeText={(text) => setForm({ ...form, email: text })}
           textContentType="emailAddress"
-          value={'amaben203phantom@gmail.com'}
+          value={'amaben218phantom@gmail.com'}
         />
         {errors?.email && <ErrorText message={errors.email?._errors[0]} />}
         <InputField

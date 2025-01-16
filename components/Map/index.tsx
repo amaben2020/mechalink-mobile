@@ -103,27 +103,13 @@ export default function MapComponent() {
 
     getCurrentLocation();
   }, []);
-  const testReq = [
-    {
-      created_at: '2025-01-15T11:08:32.302Z',
-      created_by: '15',
-      distance: '7.8888,8.99999',
-      duration: '2 hours',
-      id: 37,
-      jobId: 8,
-      mechanicId: 17,
-      status: 'NOTIFYING', // use this to hide or show timer
-      updated_at: null,
-      updated_by: null,
-      userId: 15,
-    },
-  ];
+
   const [distance, setDistance] = useState<number | null>(null); // State for distance
 
   useEffect(() => {
-    if (testReq[0]?.mechanicId && location) {
+    if (jobRequest[0]?.mechanicId && location) {
       const selectedMechanic = nearbyMechanics.find(
-        (mechanic) => mechanic.mechanicId === testReq[0]?.mechanicId
+        (mechanic) => mechanic.mechanicId === jobRequest[0]?.mechanicId
       );
 
       if (selectedMechanic) {
@@ -145,12 +131,12 @@ export default function MapComponent() {
         setDistance(calculatedDistance / 1000); // Convert to kilometers
       }
     }
-  }, [testReq[0]?.mechanicId, location, nearbyMechanics]);
+  }, [jobRequest[0]?.mechanicId, location, nearbyMechanics]);
 
   useEffect(() => {
-    if (testReq[0]?.mechanicId && location) {
+    if (jobRequest[0]?.mechanicId && location) {
       const selectedMechanic = nearbyMechanics.find(
-        (mechanic) => mechanic.mechanicId === testReq[0]?.mechanicId
+        (mechanic) => mechanic.mechanicId === jobRequest[0]?.mechanicId
       );
 
       if (selectedMechanic) {
@@ -190,19 +176,19 @@ export default function MapComponent() {
   // TODO: When the timer stops, ensure the job request pane is opened and a message is displayed "Select another mechanic, we should have cancel later"
 
   useEffect(() => {
-    if (testReq[0]?.id) {
+    if (jobRequest[0]?.id) {
       setStartCounter(true);
     } else {
       setStartCounter(false);
     }
-  }, [testReq[0]?.id]);
+  }, [jobRequest[0]?.id]);
 
   const mapRef = useRef<any>(undefined);
 
   useEffect(() => {
-    if (mapRef.current && testReq[0]?.mechanicId) {
+    if (mapRef.current && jobRequest[0]?.mechanicId) {
       const selectedMechanic = nearbyMechanics.find(
-        (mechanic) => mechanic.mechanicId === testReq[0]?.mechanicId
+        (mechanic) => mechanic.mechanicId === jobRequest[0]?.mechanicId
       );
 
       if (selectedMechanic && location) {
@@ -227,7 +213,7 @@ export default function MapComponent() {
         );
       }
     }
-  }, [nearbyMechanics, testReq[0]?.mechanicId, location]);
+  }, [nearbyMechanics, jobRequest[0]?.mechanicId, location]);
 
   return (
     <View style={styles.container}>
@@ -249,7 +235,7 @@ export default function MapComponent() {
         userInterfaceStyle="dark"
         zoomEnabled
       >
-        {testReq[0]?.id && (
+        {jobRequest[0]?.id && (
           <View style={styles.cunt}>
             <Text>
               Waiting for Mechanic name to accept job from {distance} km away
@@ -291,7 +277,7 @@ export default function MapComponent() {
               nearbyMechanics.map((mechanic) => {
                 return (
                   <Marker
-                    identifier={testReq[0]?.mechanicId}
+                    identifier={jobRequest[0]?.mechanicId}
                     key={mechanic.id}
                     coordinate={{
                       latitude: parseFloat(mechanic.lat),
@@ -300,7 +286,7 @@ export default function MapComponent() {
                     title={`Mechanic ${mechanic?.id + 1}`}
                     description="Nearby Mechanic"
                     pinColor={
-                      mechanic.mechanicId === testReq[0]?.mechanicId
+                      mechanic.mechanicId === jobRequest[0]?.mechanicId
                         ? 'orange'
                         : 'black'
                     }
@@ -309,7 +295,7 @@ export default function MapComponent() {
                       <View>
                         <Text>Mechanic {mechanic?.id + 1}</Text>
                         <Text>
-                          {mechanic?.mechanicId === testReq[0]?.mechanicId
+                          {mechanic?.mechanicId === jobRequest[0]?.mechanicId
                             ? 'Selected'
                             : 'Nearby'}{' '}
                           Mechanic
@@ -325,9 +311,9 @@ export default function MapComponent() {
           </>
         )}
         {/* Glowing Circle for Mechanic */}
-        {testReq[0]?.mechanicId &&
+        {jobRequest[0]?.mechanicId &&
           nearbyMechanics.map((mechanic) => {
-            if (mechanic.mechanicId === testReq[0]?.mechanicId) {
+            if (mechanic.mechanicId === jobRequest[0]?.mechanicId) {
               return (
                 <Circle
                   key={`mechanic-${mechanic.id}`}
@@ -347,9 +333,9 @@ export default function MapComponent() {
 
         {/* Draw Line between User and Mechanic */}
         {location &&
-          testReq[0]?.mechanicId &&
+          jobRequest[0]?.mechanicId &&
           nearbyMechanics.map((mechanic) => {
-            if (mechanic.mechanicId === testReq[0]?.mechanicId) {
+            if (mechanic.mechanicId === jobRequest[0]?.mechanicId) {
               const mechanicCoords = {
                 latitude: parseFloat(mechanic.lat),
                 longitude: parseFloat(mechanic.lng),
