@@ -15,7 +15,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-// import { Picker } from '@react-native-picker/picker';
+
 import * as Location from 'expo-location';
 import { useUserLocationStore } from '../../store/location/location';
 import { fetchAPI } from '@/lib/fetch';
