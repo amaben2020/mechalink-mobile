@@ -1,5 +1,6 @@
 {
   "expo": {
+    "platforms": ["ios", "android"],
     "name": "Mechalink",
     "slug": "mechalink",
     "version": "1.0.0",
@@ -28,11 +29,6 @@
         "android.permission.ACCESS_FINE_LOCATION"
       ],
       "package": "com.algomachine.mechalink"
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "server",
-      "favicon": "./assets/images/favreact-logo@3x"
     },
     "plugins": [
       [
