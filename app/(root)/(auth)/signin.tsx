@@ -58,6 +58,7 @@ export default function Signin() {
 
         setToken(data?.user?.stsTokenManager?.accessToken);
         setUserRole(data?.role);
+
         setUser({
           role: data?.role,
           fullName: data?.fullName,

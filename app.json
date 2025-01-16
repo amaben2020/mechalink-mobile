@@ -74,7 +74,9 @@
       "router": {
         "origin": "https://mechalink.com/"
       },
-      "eas": {}
+      "eas": {
+        "projectId": "d94f4331-97c1-4fcc-b63e-ff81b7eba584"
+      }
     },
     "owner": "algomachine"
   }

@@ -25,6 +25,7 @@ import Countdown from '../Countdown';
 
 import { getDistance } from 'geolib'; // Import geolib for distance calculation
 import clsx from 'clsx';
+import { useGetMechanicByUserId } from '@/hooks/services/mechanics/useGetMechanicByUserId';
 
 export default function MechanicMapComponent() {
   const [location, setLocation] = useState<Location.LocationObject | null>(
@@ -47,6 +48,10 @@ export default function MechanicMapComponent() {
     Array<{ lng: string; lat: string; id: string }>
   >([]);
   const { user } = useUserStore();
+  console.log('user.id', user.id);
+
+  const { data } = useGetMechanicByUserId(Number(user.id));
+  console.log('DATA', data);
 
   const updateUserLocation = async (latitude: number, longitude: number) => {
     try {
@@ -54,7 +59,7 @@ export default function MechanicMapComponent() {
       const userId = user?.id;
       if (!userId) throw new Error('User ID is missing.');
 
-      const response = await fetchAPI(`jobRequests/17`, {
+      const response = await fetchAPI(`jobRequests/${data?.mechanicId}`, {
         headers: { 'Content-Type': 'application/json' },
       });
 
@@ -80,7 +85,7 @@ export default function MechanicMapComponent() {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          status: 'ON_THE_WAY',
+          status: status,
           jobRequestId: String(jobRequestLocation?.id),
           mechanicId: 17,
         }),
@@ -89,6 +94,9 @@ export default function MechanicMapComponent() {
       console.log('resp', response);
 
       if (response.jobRequest[0].status === 'ON_THE_WAY') {
+        Alert.alert('Job Accepted');
+      }
+      if (response.jobRequest[0].status === 'ACCEPTED') {
         Alert.alert('Job Accepted');
       }
 
@@ -175,6 +183,25 @@ export default function MechanicMapComponent() {
   }, [nearbyMechanics, jobRequestLocation, location]);
 
   console.log('jobRequestLocation', jobRequestLocation);
+  const handleCountdownEnd = () => {
+    console.log('Countdown ended, triggering reassignment logic...');
+  };
+
+  const handleStop = () => {
+    console.log('Timer stopped, triggering reassignment logic...');
+  };
+
+  const [startCounter, setStartCounter] = useState(false);
+
+  useEffect(() => {
+    if (jobRequestLocation.status === 'ON_THE_WAY') {
+      setStartCounter(true);
+    } else {
+      setStartCounter(false);
+    }
+  }, [jobRequestLocation.status]);
+
+  console.log('jobRequestLocation', jobRequestLocation);
 
   return (
     <View style={styles.container}>
@@ -225,7 +252,13 @@ export default function MechanicMapComponent() {
             <Text>Do you want to accept the job?</Text>
             <TouchableOpacity
               style={styles.acceptButton}
-              onPress={() => acceptOrDecline('ON_THE_WAY')}
+              onPress={() =>
+                acceptOrDecline(
+                  jobRequestLocation.status === 'ON_THE_WAY'
+                    ? 'ACCEPTED'
+                    : 'ON_THE_WAY'
+                )
+              }
             >
               <Text style={styles.buttonText}>Yes</Text>
             </TouchableOpacity>
@@ -253,9 +286,58 @@ export default function MechanicMapComponent() {
               shadowRadius: 3.84,
             }}
           >
-            <Text>Hooray, you;re on your way to work </Text>
+            <Text>Hooray, you're on your way to work </Text>
             <Text>Start job once you arrive destination</Text>
+            <Countdown
+              minutes={10} // Start with 10 minutes
+              onCountdownEnd={handleCountdownEnd}
+              onStop={handleStop}
+              startCounter={startCounter}
+            />
+            <TouchableOpacity
+              style={styles.acceptButton}
+              onPress={() =>
+                acceptOrDecline(
+                  jobRequestLocation.status === 'ON_THE_WAY'
+                    ? 'ACCEPTED'
+                    : 'ON_THE_WAY'
+                )
+              }
+            >
+              <Text style={styles.buttonText}>Yes</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.declineButton}>
+              <Text style={styles.buttonText}>No</Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
+        {jobRequestLocation.status === 'ACCEPTED' && (
+          <View
+            style={{
+              backgroundColor: '#FFA500',
+              position: 'absolute',
+              top: 50,
+              left: '20%',
+              transform: [{ translateX: -0.5 * (80 / 100) * 100 }],
+              width: '60%',
+              padding: 15,
+              borderRadius: 15,
+              elevation: 4,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+            }}
+          >
+            <Text>IN PROGRESS cos the job is now started </Text>
+
+            <Countdown
+              minutes={10} // Start with 10 minutes
+              onCountdownEnd={handleCountdownEnd}
+              onStop={handleStop}
+              startCounter={startCounter}
+            />
             <TouchableOpacity
               style={styles.acceptButton}
               onPress={() => acceptOrDecline('ON_THE_WAY')}
