@@ -1,4 +1,4 @@
-import { devtools, persist } from 'zustand/middleware';
+// import { devtools, persist } from 'zustand/middleware';
 import { create } from 'zustand';
 
 export type TMechanics = {
@@ -21,21 +21,21 @@ type TMechanicsStore = {
 };
 
 export const useMechanicsStore = create<TMechanicsStore>()(
-  devtools(
-    persist(
-      (set) => ({
-        mechanics: [],
-        //@ts-ignore
-        mechanic: {},
-        setMechanics: (mechanics: TMechanics[]) => set({ mechanics }),
-        setMechanic: (mechanic: TMechanics) =>
-          set((state) => ({
-            mechanic: state.mechanics.find((m) => m.id === mechanic.id),
-          })),
-      }),
-      {
-        name: 'mechanics-storage',
-      }
-    )
-  )
+  // devtools(
+  //   persist(
+  (set) => ({
+    mechanics: [],
+    //@ts-ignore
+    mechanic: {},
+    setMechanics: (mechanics: TMechanics[]) => set({ mechanics }),
+    setMechanic: (mechanic: TMechanics) =>
+      set((state) => ({
+        mechanic: state.mechanics.find((m) => m.id === mechanic.id),
+      })),
+  })
+  // {
+  //   name: 'mechanics-storage',
+  // }
+  //   )
+  // )
 );

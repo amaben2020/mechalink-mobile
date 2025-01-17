@@ -8,18 +8,18 @@ type TAuth = {
 };
 
 export const useSignupStore = create<TAuth>()(
-  devtools(
-    persist(
-      (set) => ({
-        token: '',
-        setToken: (token: string) => set({ token }),
-        removeToken: () => set({ token: '' }),
-      }),
-      {
-        name: 'user-storage',
-      }
-    )
-  )
+  // devtools(
+  //   persist(
+  (set) => ({
+    token: '',
+    setToken: (token: string) => set({ token }),
+    removeToken: () => set({ token: '' }),
+  })
+  //     {
+  //       name: 'user-storage',
+  //     }
+  //   )
+  // )
 );
 
 type TUser = {
@@ -43,15 +43,15 @@ export type TUserStore = {
 };
 
 export const useUserStore = create<TUserStore>()(
-  devtools(
-    persist(
-      (set) => ({
-        user: { email: '', role: '' },
-        setUser: (user) => set({ user }),
-      }),
-      {
-        name: 'user-store',
-      }
-    )
-  )
+  // devtools(
+  //   persist(
+  (set) => ({
+    user: { email: '', role: '' },
+    setUser: (user) => set({ user }),
+  })
+  //     {
+  //       name: 'user-store',
+  //     }
+  //   )
+  // )
 );
