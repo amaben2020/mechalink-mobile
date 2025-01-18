@@ -331,6 +331,7 @@ export default function MapComponent() {
 
         {/* Draw Line between User and Mechanic */}
         {userRequest?.mechanicId &&
+          location &&
           data?.nearbyMechs.map((mechanic) => {
             if (mechanic?.mechanicId === userRequest?.mechanicId) {
               const mechanicCoords = {
