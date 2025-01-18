@@ -333,7 +333,7 @@ export default function MapComponent() {
         {userRequest?.mechanicId &&
           location &&
           data?.nearbyMechs.map((mechanic) => {
-            if (mechanic?.mechanicId === userRequest?.mechanicId) {
+            if (+mechanic?.mechanicId === userRequest?.mechanicId) {
               const mechanicCoords = {
                 latitude: parseFloat(mechanic.lat),
                 longitude: parseFloat(mechanic.lng),
