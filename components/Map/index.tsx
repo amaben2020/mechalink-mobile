@@ -4,17 +4,15 @@ import MapView, {
   PROVIDER_DEFAULT,
   Marker,
   Circle,
-  Callout,
   Polyline,
 } from 'react-native-maps';
 import {
   ActivityIndicator,
+  Image,
   Platform,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
-  Image,
 } from 'react-native';
 import * as Location from 'expo-location';
 import { useUserLocationStore } from '../../store/location/location';
@@ -27,6 +25,7 @@ import { useJobRequestStore } from '@/store/jobRequests/jobRequest';
 import { getDistance } from 'geolib';
 import LottieView from 'lottie-react-native';
 import { useGetNearbyMechanics } from '@/hooks/services/mechanics/useGetNearbyMechanics';
+import { images } from '@/constants/Icons';
 
 export default function MapComponent() {
   const [location, setLocation] = useState<Location.LocationObject | null>(
@@ -68,6 +67,9 @@ export default function MapComponent() {
   const [startCounter, setStartCounter] = useState(false);
 
   const { jobRequest } = useJobRequestStore();
+
+  console.log('userId', userId);
+  console.log(jobRequest);
 
   const userRequest = jobRequest.find(
     (request) => request.userId === Number(userId)
@@ -126,8 +128,10 @@ export default function MapComponent() {
   useEffect(() => {
     if (userRequest?.mechanicId && location) {
       const selectedMechanic = data?.nearbyMechs.find(
-        (mechanic) => mechanic.mechanicId === userRequest?.mechanicId
+        (mechanic) => mechanic.mechanicId == String(userRequest?.mechanicId)
       );
+
+      console.log('selectedMechanic', selectedMechanic);
 
       if (selectedMechanic) {
         const userCoordinates = {
@@ -169,10 +173,12 @@ export default function MapComponent() {
   useEffect(() => {
     if (mapRef.current && userRequest?.mechanicId) {
       const selectedMechanic = data?.nearbyMechs.find(
-        (mechanic) => mechanic.mechanicId === userRequest?.mechanicId
+        (mechanic) => mechanic.mechanicId == String(userRequest?.mechanicId)
       );
 
-      if (selectedMechanic && location) {
+      console.log('selectedMechanic', selectedMechanic);
+
+      if (selectedMechanic?.id && location) {
         // Coordinates for both user and mechanic
         const userCoordinates = {
           latitude: location.coords.latitude,
@@ -239,12 +245,9 @@ export default function MapComponent() {
         showsPointsOfInterest={false}
         zoomEnabled
       >
-        {userRequest?.id && (
+        {userRequest?.id && userRequest?.status === 'ON_THE_WAY' && (
           <View className="text-white">
-            <Text>
-              Waiting for Mechanic name to accept job from {distance} meters
-              away
-            </Text>
+            <Text>Mechanic {distance} meters away</Text>
             <View className="flex flex-row items-center border">
               <Ionicons name="time-sharp" size={40} color="white" />
               <Countdown
@@ -257,21 +260,23 @@ export default function MapComponent() {
           </View>
         )}
 
-        <View className="flex flex-col gap-2 mb-20">
-          <LottieView
-            source={require('./../../assets/l-r.json')}
-            autoPlay
-            loop
-            style={{
-              height: 250,
-              width: 500,
-            }}
-          />
+        {userRequest?.status === 'NOTIFYING' && (
+          <View className="flex flex-col gap-2 mb-20">
+            <LottieView
+              source={require('./../../assets/l-r.json')}
+              autoPlay
+              loop
+              style={{
+                height: 250,
+                width: 500,
+              }}
+            />
 
-          <Text className="font-JakartaBold text-white text-center">
-            Waiting for request to be accepted by mechanic...
-          </Text>
-        </View>
+            <Text className="font-JakartaBold text-white text-center">
+              Waiting for request to be accepted by mechanic...
+            </Text>
+          </View>
+        )}
 
         {location && (
           <>
@@ -296,6 +301,12 @@ export default function MapComponent() {
             />
             {data?.nearbyMechs.map((mechanic) => (
               <Marker
+                tracksViewChanges
+                // image={
+                //   Number(mechanic.mechanicId) === userRequest?.mechanicId!
+                //     ? images.mechanicAvatar
+                //     : ''
+                // }
                 key={mechanic.id}
                 coordinate={{
                   latitude: parseFloat(mechanic.lat),
@@ -303,24 +314,39 @@ export default function MapComponent() {
                 }}
                 title={`Mechanic ${mechanic.id}`}
                 description="Nearby Mechanic"
+                pinColor={
+                  Number(mechanic.mechanicId) === userRequest?.mechanicId!
+                    ? 'yellow'
+                    : 'blue'
+                }
               />
+
+              //    <Image
+              //     source={
+              //       Number(mechanic.mechanicId) === userRequest?.mechanicId!
+              //         ? images.mechanicAvatar
+              //         : ''
+              //     }
+              //     style={{ width: 48, height: 48, resizeMode: 'contain' }}
+              //     className="w-20 h-20"
+              //   />
+              // </Marker>
             ))}
           </>
         )}
 
         {/* Draw Line between User and Mechanic */}
-        {location &&
-          userRequest?.mechanicId &&
+        {userRequest?.mechanicId &&
           data?.nearbyMechs.map((mechanic) => {
-            if (mechanic.mechanicId === userRequest?.mechanicId) {
+            if (mechanic?.mechanicId === userRequest?.mechanicId) {
               const mechanicCoords = {
                 latitude: parseFloat(mechanic.lat),
                 longitude: parseFloat(mechanic.lng),
               };
 
               const userCoords = {
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude,
+                latitude: location?.coords.latitude,
+                longitude: location?.coords.longitude,
               };
 
               if (!mechanicCoords.latitude) return null;

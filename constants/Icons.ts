@@ -33,6 +33,7 @@ import onboarding2 from '@/assets/images/onboarding2.png';
 import onboarding3 from '@/assets/images/onboarding3.png';
 import signUpCar from '@/assets/images/signup-car.png';
 import earthGif from '@/assets/images/earth.gif';
+import mechanicAvatar from '@/assets/images/mech.png';
 
 export const images = {
   onboarding1,
@@ -44,6 +45,7 @@ export const images = {
   noResult,
   message,
   earthGif,
+  mechanicAvatar,
 };
 
 export const icons = {
