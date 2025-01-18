@@ -13,7 +13,7 @@ export const useGetNearbyMechanics = ({
   radius: number;
   userId: string;
 }) => {
-  return useQuery<TMechanics[], Error>({
+  return useQuery<{ nearbyMechs: TMechanics[] }, Error>({
     queryKey: ['nearbyMechs', userId],
     queryFn: async () => {
       try {
