@@ -19,7 +19,7 @@ import { useSignupStore, useUserStore } from '@/store/auth/get-user';
 export default function Signin() {
   const [form, setForm] = useState({
     password: 'Password123!',
-    // email: 'amaben218phantom@gmail.com',
+    // email: 'amaben218phantom@gmail.com', 203
     email: 'amaben218phantom@gmail.com',
   });
 
@@ -98,7 +98,7 @@ export default function Signin() {
           placeholder="Enter a Email"
           onChangeText={(text) => setForm({ ...form, email: text })}
           textContentType="emailAddress"
-          value={'amaben218phantom@gmail.com'}
+          value={form.email}
         />
         {errors?.email && <ErrorText message={errors.email?._errors[0]} />}
         <InputField

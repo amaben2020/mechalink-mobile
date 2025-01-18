@@ -28,6 +28,7 @@ import {
   useGetUserJobRequest,
 } from '@/hooks/services/mechanics/useGetNearbyMechanics';
 import { images } from '@/constants/Icons';
+import GlobeLoader from '../GlobeLoader';
 
 export default function MapComponent() {
   const [location, setLocation] = useState<Location.LocationObject | null>(
@@ -61,6 +62,8 @@ export default function MapComponent() {
 
   const { jobRequest } = useJobRequestStore();
 
+  console.log('location ===>', location?.coords);
+
   const { data: userJobRequestLocation, isLoading: isRequestLoading } =
     useGetUserJobRequest(String(userId));
 
@@ -68,7 +71,7 @@ export default function MapComponent() {
   const userRequest =
     userJobRequestLocation ||
     jobRequest.find((request) => request.userId === Number(userId));
-  console.log('userJobRequestLocation', userJobRequestLocation);
+  console.log('userJobRequestLocation after!!!', userJobRequestLocation);
   const handleCountdownEnd = () => {
     console.log('Countdown ended, triggering reassignment logic...');
   };
@@ -166,12 +169,12 @@ export default function MapComponent() {
   }, [data?.nearbyMechs.length]);
 
   useEffect(() => {
-    if (userRequest?.id) {
+    if (userRequest?.userId) {
       setStartCounter(true);
     } else {
       setStartCounter(false);
     }
-  }, [userRequest?.id]);
+  }, [userRequest?.userId]);
 
   const mapRef = useRef<any>(undefined);
 
@@ -208,23 +211,7 @@ export default function MapComponent() {
   }, [data?.nearbyMechs, userRequest?.mechanicId, location]);
 
   if (isLoading || isNearbyMechanicLoading || isRequestLoading) {
-    return (
-      <View style={styles.loadingContainer}>
-        //TODO: move to component
-        <LottieView
-          source={require('./../../assets/globe.json')}
-          autoPlay
-          loop
-          style={{
-            height: 250,
-            width: 500,
-          }}
-        />
-        <Text className="text-white font-JakartaBold text-lg flex items-center">
-          Loading map data... <ActivityIndicator size="large" color="#fff" />
-        </Text>
-      </View>
-    );
+    return <GlobeLoader />;
   }
 
   console.log('userRequest==>', userRequest);
@@ -380,12 +367,6 @@ export default function MapComponent() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#000',
   },
   errorContainer: {
     flex: 1,

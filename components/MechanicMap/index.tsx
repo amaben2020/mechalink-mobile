@@ -8,7 +8,6 @@ import MapView, {
   Polyline,
 } from 'react-native-maps';
 import {
-  ActivityIndicator,
   Alert,
   Platform,
   StyleSheet,
@@ -20,13 +19,15 @@ import * as Location from 'expo-location';
 import { useUserLocationStore } from '../../store/location/location';
 import { fetchAPI } from '@/lib/fetch';
 import { useUserStore } from '@/store/auth/get-user';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import Countdown from '../Countdown';
 
 import { getDistance } from 'geolib'; // Import geolib for distance calculation
 import clsx from 'clsx';
-import { useGetMechanicByUserId } from '@/hooks/services/mechanics/useGetMechanicByUserId';
-import { useGetUserJobRequest } from '@/hooks/services/mechanics/useGetNearbyMechanics';
+import {
+  useGetMechanicByUserId,
+  useJobRequestByMechanicId,
+} from '@/hooks/services/mechanics/useGetMechanicByUserId';
+import GlobeLoader from '../GlobeLoader';
 
 export default function MechanicMapComponent() {
   const [location, setLocation] = useState<Location.LocationObject | null>(
@@ -43,37 +44,38 @@ export default function MechanicMapComponent() {
   const { setLocation: setMechanicLocation } = useUserLocationStore();
   const [isLoading, setIsLoading] = useState(false);
   const [radius, setRadius] = useState<number>(2000);
-  const [jobRequestLocation, setJobRequestLocation] = useState<any>({});
 
-  const [nearbyMechanics, setNearbyMechanics] = useState<
-    Array<{ lng: string; lat: string; id: string }>
-  >([]);
   const { user } = useUserStore();
-  console.log('user.id', user.id);
 
   const { data } = useGetMechanicByUserId(Number(user.id));
 
-  console.log('data==>', data);
+  const {
+    data: jobRequestLocation,
+    isLoading: isJobRequestForMechanicLoading,
+  } = useJobRequestByMechanicId(Number(data?.mechanicId));
 
-  const updateUserLocation = async () => {
+  const updateMechanicLocation = async () => {
     try {
       setIsLoading(true);
       const userId = user?.id;
       if (!userId) throw new Error('User ID is missing.');
 
-      const response = await fetchAPI(`jobRequests/${data?.mechanicId}`, {
+      await fetchAPI(`users/user-location?userId=${userId}`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          latitude: location?.coords.latitude,
+          longitude: location?.coords.longitude,
+        }),
       });
-
-      setJobRequestLocation(response);
-      setIsLoading(false);
     } catch (error) {
-      setIsLoading(false);
       console.error(
         'Error updating user location or fetching mechanics:',
         error
       );
       setErrorMsg('Unable to update location or fetch nearby mechanics.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -102,7 +104,7 @@ export default function MechanicMapComponent() {
         Alert.alert('Job Accepted');
       }
 
-      setJobRequestLocation(response);
+      // setJobRequestLocation(response);
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
@@ -111,6 +113,8 @@ export default function MechanicMapComponent() {
         error
       );
       setErrorMsg('Unable to update location or fetch nearby mechanics.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -135,7 +139,7 @@ export default function MechanicMapComponent() {
         latitudeDelta: 0.02,
         longitudeDelta: 0.02,
       });
-      await updateUserLocation(loc.coords.latitude, loc.coords.longitude);
+      await updateMechanicLocation();
     }
 
     getCurrentLocation();
@@ -151,8 +155,8 @@ export default function MechanicMapComponent() {
       };
 
       const mechanicCoordinates = {
-        latitude: parseFloat(jobRequestLocation.location.latitude),
-        longitude: parseFloat(jobRequestLocation.location.longitude),
+        latitude: Number(jobRequestLocation?.location.latitude),
+        longitude: Number(jobRequestLocation?.location.longitude),
       };
 
       const calculatedDistance = getDistance(
@@ -173,8 +177,8 @@ export default function MechanicMapComponent() {
       };
 
       const jobRequestCoordinate = {
-        latitude: parseFloat(jobRequestLocation.location.latitude),
-        longitude: parseFloat(jobRequestLocation.location.longitude),
+        latitude: Number(jobRequestLocation?.location.latitude),
+        longitude: Number(jobRequestLocation?.location.longitude),
       };
 
       mapRef.current.fitToCoordinates([userCoordinates, jobRequestCoordinate], {
@@ -182,7 +186,7 @@ export default function MechanicMapComponent() {
         animated: true,
       });
     }
-  }, [nearbyMechanics, jobRequestLocation, location]);
+  }, [jobRequestLocation, location]);
 
   console.log('jobRequestLocation', jobRequestLocation);
   const handleCountdownEnd = () => {
@@ -196,15 +200,15 @@ export default function MechanicMapComponent() {
   const [startCounter, setStartCounter] = useState(false);
 
   useEffect(() => {
-    if (jobRequestLocation.status === 'ON_THE_WAY') {
+    if (jobRequestLocation?.status === 'ON_THE_WAY') {
       setStartCounter(true);
     } else {
       setStartCounter(false);
     }
-  }, [jobRequestLocation.status]);
+  }, [jobRequestLocation?.status]);
 
-  if (isLoading) {
-    return <Text>Loading...</Text>;
+  if (isLoading || isJobRequestForMechanicLoading) {
+    return <GlobeLoader />;
   }
 
   return (
@@ -229,10 +233,10 @@ export default function MechanicMapComponent() {
         userInterfaceStyle="dark"
         zoomEnabled
       >
-        {jobRequestLocation.status === 'NOTIFYING' ? (
+        {jobRequestLocation?.status === 'NOTIFYING' ? (
           <View
             className={clsx(
-              jobRequestLocation.status === 'ON_THE_WAY' ? 'hidden' : ''
+              jobRequestLocation?.status === 'ON_THE_WAY' ? 'hidden' : ''
             )}
             style={{
               backgroundColor: '#FFA500',
@@ -249,7 +253,7 @@ export default function MechanicMapComponent() {
               shadowOpacity: 0.25,
               shadowRadius: 3.84,
               display:
-                jobRequestLocation.status === 'ON_THE_WAY' ? 'none' : 'flex',
+                jobRequestLocation?.status === 'ON_THE_WAY' ? 'none' : 'flex',
             }}
           >
             <Text>Job is {distance} km away</Text>
@@ -258,7 +262,7 @@ export default function MechanicMapComponent() {
               style={styles.acceptButton}
               onPress={() =>
                 acceptOrDecline(
-                  jobRequestLocation.status === 'ON_THE_WAY'
+                  jobRequestLocation?.status === 'ON_THE_WAY'
                     ? 'ACCEPTED'
                     : 'ON_THE_WAY'
                 )
@@ -272,7 +276,7 @@ export default function MechanicMapComponent() {
           </View>
         ) : null}
 
-        {jobRequestLocation.status === 'ON_THE_WAY' && (
+        {jobRequestLocation?.status === 'ON_THE_WAY' && (
           <View
             style={{
               backgroundColor: '#FFA500',
@@ -302,7 +306,7 @@ export default function MechanicMapComponent() {
               style={styles.acceptButton}
               onPress={() =>
                 acceptOrDecline(
-                  jobRequestLocation.status === 'ON_THE_WAY'
+                  jobRequestLocation?.status === 'ON_THE_WAY'
                     ? 'ACCEPTED'
                     : 'ON_THE_WAY'
                 )
@@ -316,7 +320,7 @@ export default function MechanicMapComponent() {
           </View>
         )}
 
-        {jobRequestLocation.status === 'ACCEPTED' && (
+        {jobRequestLocation?.status === 'ACCEPTED' && (
           <View
             style={{
               backgroundColor: '#FFA500',
@@ -360,7 +364,7 @@ export default function MechanicMapComponent() {
                 latitude: location.coords.latitude,
                 longitude: location.coords.longitude,
               }}
-              title="Your Location (mechanic)"
+              title={'Your Location (mechanic)'}
               description="You are here"
               pinColor="green"
             />
@@ -376,11 +380,11 @@ export default function MechanicMapComponent() {
             />
             <Marker
               coordinate={{
-                latitude: jobRequestLocation?.location?.latitude,
-                longitude: jobRequestLocation?.location?.longitude,
+                latitude: Number(jobRequestLocation?.location?.latitude),
+                longitude: Number(jobRequestLocation?.location?.longitude),
               }}
-              title="Job"
-              description="Nearby User"
+              title="Job Location"
+              description="Client location"
               pinColor="black"
             >
               <Callout>
@@ -394,8 +398,8 @@ export default function MechanicMapComponent() {
         {jobRequestLocation?.location && (
           <Circle
             center={{
-              latitude: parseFloat(jobRequestLocation.location.latitude),
-              longitude: parseFloat(jobRequestLocation.location.longitude),
+              latitude: Number(jobRequestLocation?.location.latitude),
+              longitude: Number(jobRequestLocation?.location.longitude),
             }}
             radius={10}
             strokeWidth={20}
@@ -411,11 +415,11 @@ export default function MechanicMapComponent() {
                 latitude: location.coords.latitude,
               },
               {
-                longitude: parseFloat(jobRequestLocation.location.longitude),
-                latitude: parseFloat(jobRequestLocation.location.latitude),
+                longitude: Number(jobRequestLocation?.location?.longitude),
+                latitude: Number(jobRequestLocation?.location?.latitude),
               },
             ]}
-            strokeColor="#FF0000"
+            strokeColor="green"
             strokeWidth={10}
           />
         )}
