@@ -26,6 +26,7 @@ import Countdown from '../Countdown';
 import { getDistance } from 'geolib'; // Import geolib for distance calculation
 import clsx from 'clsx';
 import { useGetMechanicByUserId } from '@/hooks/services/mechanics/useGetMechanicByUserId';
+import { useGetUserJobRequest } from '@/hooks/services/mechanics/useGetNearbyMechanics';
 
 export default function MechanicMapComponent() {
   const [location, setLocation] = useState<Location.LocationObject | null>(
@@ -43,7 +44,7 @@ export default function MechanicMapComponent() {
   const [isLoading, setIsLoading] = useState(false);
   const [radius, setRadius] = useState<number>(2000);
   const [jobRequestLocation, setJobRequestLocation] = useState<any>({});
-  console.log(jobRequestLocation);
+
   const [nearbyMechanics, setNearbyMechanics] = useState<
     Array<{ lng: string; lat: string; id: string }>
   >([]);
@@ -51,9 +52,10 @@ export default function MechanicMapComponent() {
   console.log('user.id', user.id);
 
   const { data } = useGetMechanicByUserId(Number(user.id));
-  console.log('DATA', data);
 
-  const updateUserLocation = async (latitude: number, longitude: number) => {
+  console.log('data==>', data);
+
+  const updateUserLocation = async () => {
     try {
       setIsLoading(true);
       const userId = user?.id;
@@ -91,7 +93,7 @@ export default function MechanicMapComponent() {
         }),
       });
 
-      console.log('resp', response);
+      console.log('resp===>', response);
 
       if (response.jobRequest[0].status === 'ON_THE_WAY') {
         Alert.alert('Job Accepted');

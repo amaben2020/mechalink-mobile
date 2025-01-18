@@ -23,7 +23,10 @@ import Countdown from '../Countdown';
 import { useJobRequestStore } from '@/store/jobRequests/jobRequest';
 import { getDistance } from 'geolib';
 import LottieView from 'lottie-react-native';
-import { useGetNearbyMechanics } from '@/hooks/services/mechanics/useGetNearbyMechanics';
+import {
+  useGetNearbyMechanics,
+  useGetUserJobRequest,
+} from '@/hooks/services/mechanics/useGetNearbyMechanics';
 import { images } from '@/constants/Icons';
 
 export default function MapComponent() {
@@ -40,6 +43,7 @@ export default function MapComponent() {
 
   const { user } = useUserStore();
   const userId = user?.id;
+
   const [isLoading, setIsLoading] = useState(true); // Initially loading
   const [radius, setRadius] = useState<number>(2000);
   const { setLocation: setUserLocation } = useUserLocationStore();
@@ -55,6 +59,16 @@ export default function MapComponent() {
     userId: String(userId),
   });
 
+  const { jobRequest } = useJobRequestStore();
+
+  const { data: userJobRequestLocation, isLoading: isRequestLoading } =
+    useGetUserJobRequest(String(userId));
+
+  console.log('userJobRequestLocation ===>', userJobRequestLocation);
+  const userRequest =
+    userJobRequestLocation ||
+    jobRequest.find((request) => request.userId === Number(userId));
+  console.log('userJobRequestLocation', userJobRequestLocation);
   const handleCountdownEnd = () => {
     console.log('Countdown ended, triggering reassignment logic...');
   };
@@ -65,11 +79,8 @@ export default function MapComponent() {
 
   const [startCounter, setStartCounter] = useState(false);
 
-  const { jobRequest } = useJobRequestStore();
-
-  const userRequest = jobRequest.find(
-    (request) => request.userId === Number(userId)
-  );
+  // const {data}
+  // pull in jobRequest and use the status
 
   const updateUserLocation = async (lat: number, long: number) => {
     try {
@@ -196,7 +207,7 @@ export default function MapComponent() {
     }
   }, [data?.nearbyMechs, userRequest?.mechanicId, location]);
 
-  if (isLoading || isNearbyMechanicLoading) {
+  if (isLoading || isNearbyMechanicLoading || isRequestLoading) {
     return (
       <View style={styles.loadingContainer}>
         //TODO: move to component
@@ -216,7 +227,7 @@ export default function MapComponent() {
     );
   }
 
-  console.log('userRequest', userRequest);
+  console.log('userRequest==>', userRequest);
 
   if (errorMsg || isError) {
     return (
@@ -239,7 +250,7 @@ export default function MapComponent() {
         showsPointsOfInterest={false}
         zoomEnabled
       >
-        {userRequest?.id && userRequest?.status === 'ON_THE_WAY' && (
+        {userRequest?.userId && userRequest?.status === 'ON_THE_WAY' && (
           <View className="text-white">
             <Text>Mechanic {distance} meters away</Text>
             <View className="flex flex-row items-center border">
