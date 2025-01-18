@@ -8,7 +8,6 @@ import MapView, {
 } from 'react-native-maps';
 import {
   ActivityIndicator,
-  Image,
   Platform,
   StyleSheet,
   Text,
@@ -67,9 +66,6 @@ export default function MapComponent() {
   const [startCounter, setStartCounter] = useState(false);
 
   const { jobRequest } = useJobRequestStore();
-
-  console.log('userId', userId);
-  console.log(jobRequest);
 
   const userRequest = jobRequest.find(
     (request) => request.userId === Number(userId)
@@ -130,8 +126,6 @@ export default function MapComponent() {
       const selectedMechanic = data?.nearbyMechs.find(
         (mechanic) => mechanic.mechanicId == String(userRequest?.mechanicId)
       );
-
-      console.log('selectedMechanic', selectedMechanic);
 
       if (selectedMechanic) {
         const userCoordinates = {
