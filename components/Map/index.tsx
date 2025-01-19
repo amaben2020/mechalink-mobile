@@ -32,7 +32,7 @@ import GlobeLoader from '../GlobeLoader';
 
 export default function MapComponent() {
   const [location, setLocation] = useState<Location.LocationObject | null>(
-    null
+    null,
   );
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [region, setRegion] = useState({
@@ -138,7 +138,7 @@ export default function MapComponent() {
   useEffect(() => {
     if (userRequest?.mechanicId && location) {
       const selectedMechanic = data?.nearbyMechs.find(
-        (mechanic) => mechanic.mechanicId == String(userRequest?.mechanicId)
+        (mechanic) => mechanic.mechanicId == String(userRequest?.mechanicId),
       );
 
       if (selectedMechanic) {
@@ -155,18 +155,18 @@ export default function MapComponent() {
         //Calculate the distance using geolib
         const calculatedDistance = getDistance(
           userCoordinates,
-          mechanicCoordinates
+          mechanicCoordinates,
         ); // Returns distance in meters
         setDistance(calculatedDistance); //Convert to kilometers
       }
     }
-  }, [userRequest?.mechanicId, location, data?.nearbyMechs]);
+  }, [data?.nearbyMechs, location, userRequest?.mechanicId]);
 
   useEffect(() => {
     if (data?.nearbyMechs.length! > 0 && !isLoading) {
       setMechanics(data?.nearbyMechs!);
     }
-  }, [data?.nearbyMechs.length]);
+  }, [data?.nearbyMechs, data?.nearbyMechs.length, isLoading]);
 
   useEffect(() => {
     if (userRequest?.userId) {
@@ -181,7 +181,7 @@ export default function MapComponent() {
   useEffect(() => {
     if (mapRef.current && userRequest?.mechanicId) {
       const selectedMechanic = data?.nearbyMechs.find(
-        (mechanic) => mechanic.mechanicId == String(userRequest?.mechanicId)
+        (mechanic) => mechanic.mechanicId == String(userRequest?.mechanicId),
       );
 
       console.log('selectedMechanic', selectedMechanic);
@@ -204,7 +204,7 @@ export default function MapComponent() {
           {
             edgePadding: { top: 100, right: 100, bottom: 100, left: 100 },
             animated: true,
-          }
+          },
         );
       }
     }
@@ -266,6 +266,24 @@ export default function MapComponent() {
 
             <Text className="font-JakartaBold text-white text-center">
               Waiting for request to be accepted by mechanic...
+            </Text>
+          </View>
+        )}
+
+        {userRequest?.status === 'ACCEPTED' && (
+          <View className="flex flex-col gap-2 mb-20">
+            <LottieView
+              source={require('./../../assets/l-r.json')}
+              autoPlay
+              loop
+              style={{
+                height: 250,
+                width: 500,
+              }}
+            />
+
+            <Text className="font-JakartaBold text-white text-center">
+              JOB IN PROGRESS BY MECHANIC
             </Text>
           </View>
         )}

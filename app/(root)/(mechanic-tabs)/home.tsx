@@ -10,7 +10,7 @@ import { router } from 'expo-router';
 export default function HomeScreen() {
   const { mechanics, setMechanic } = useMechanicsStore();
   const [selectedMechanic, setSelectedMechanic] = useState<TMechanics | null>(
-    null
+    null,
   );
 
   return (
@@ -28,7 +28,7 @@ export default function HomeScreen() {
             className={clsx(
               selectedMechanic?.id === mech.id &&
                 'bg-primary-500 text-white font-JakartaBold',
-              'border-gray-200 border flex flex-row justify-between rounded-xl'
+              'border-gray-200 border flex flex-row justify-between rounded-xl',
             )}
           >
             {({ pressed }) => {
@@ -40,7 +40,7 @@ export default function HomeScreen() {
                         pressed && 'text-white',
                         selectedMechanic?.id === mech.id &&
                           'bg-primary-500 text-white font-JakartaBold',
-                        'font-JakartaBold text-base'
+                        'font-JakartaBold text-base',
                       )}
                     >
                       Username: {mech?.username ?? mech?.id} {}
@@ -50,7 +50,7 @@ export default function HomeScreen() {
                         pressed && 'text-white',
                         selectedMechanic?.id === mech.id &&
                           'bg-primary-500 text-white font-JakartaBold',
-                        'font-JakartaBold text-base'
+                        'font-JakartaBold text-base',
                       )}
                     >
                       Jobs Done: {mech?.jobCount}
@@ -61,7 +61,7 @@ export default function HomeScreen() {
                           pressed && 'text-white',
                           selectedMechanic?.id === mech.id &&
                             'bg-primary-500 text-white font-JakartaBold',
-                          'font-JakartaBold text-base'
+                          'font-JakartaBold text-base',
                         )}
                       >
                         Arrival Time:

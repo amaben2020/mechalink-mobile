@@ -35,7 +35,7 @@ const Countdown: React.FC<CountdownProps> = ({
       intervalRef.current = setInterval(() => {
         setTimeLeft((prev) => {
           const elapsedTime = Math.floor(
-            (Date.now() - startTimestampRef.current!) / 1000
+            (Date.now() - startTimestampRef.current!) / 1000,
           );
           const newTimeLeft = Math.max(prev - 1, 0); // Ensure timeLeft doesn't go below 0
 
@@ -59,7 +59,7 @@ const Countdown: React.FC<CountdownProps> = ({
       setIsRunning(false);
       clearInterval(intervalRef.current as NodeJS.Timeout);
       const elapsedTime = Math.floor(
-        (Date.now() - startTimestampRef.current!) / 1000
+        (Date.now() - startTimestampRef.current!) / 1000,
       );
       saveTimerState(timeLeft, elapsedTime); // Save current state when paused
     }
@@ -83,7 +83,7 @@ const Countdown: React.FC<CountdownProps> = ({
       const timestamp = Date.now() - elapsedTime * 1000; // Adjust the timestamp based on elapsed time
       await AsyncStorage.setItem(
         TIMER_KEY,
-        JSON.stringify({ timeLeft: time, timestamp })
+        JSON.stringify({ timeLeft: time, timestamp }),
       );
     } catch (error) {
       console.error('Failed to save timer state:', error);

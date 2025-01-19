@@ -8,7 +8,7 @@ export const signupSchema = z.object({
     .min(8, 'Password must be at least 8 characters')
     .regex(
       /^(?=.*[A-Z])(?=.*\d).*$/,
-      'Password must include a number and an uppercase letter'
+      'Password must include a number and an uppercase letter',
     ),
   addressOne: z.string().min(2, 'Invalid address'),
   role: z.enum(['client', 'mechalink']),
@@ -22,6 +22,6 @@ export const signinSchema = z.object({
     .min(8, 'Password must be at least 8 characters')
     .regex(
       /^(?=.*[A-Z])(?=.*\d).*$/,
-      'Password must include a number and an uppercase letter'
+      'Password must include a number and an uppercase letter',
     ),
 });

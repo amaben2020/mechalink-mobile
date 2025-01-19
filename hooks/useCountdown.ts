@@ -83,7 +83,7 @@ export const useCountdown = ({
       const timestamp = Date.now();
       await AsyncStorage.setItem(
         TIMER_KEY,
-        JSON.stringify({ timeLeft: time, timestamp })
+        JSON.stringify({ timeLeft: time, timestamp }),
       );
     } catch (error) {
       console.error('Failed to save timer state:', error);

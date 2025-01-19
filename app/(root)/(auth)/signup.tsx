@@ -30,7 +30,7 @@ export default function Signup() {
   });
   const [isSuccess, setIsSuccess] = useState(false);
   const [errors, setErrors] = useState<z.ZodFormattedError<typeof form> | null>(
-    null
+    null,
   );
 
   const createUser = async () => {

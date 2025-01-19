@@ -19,7 +19,7 @@ const PressableButton = ({
         pressedIn && 'bg-primary-500 text-white',
         selected && 'bg-primary-500 text-white',
         'py-5 px-2',
-        className
+        className,
       )}
       onPress={onPress}
       onPressIn={() => {

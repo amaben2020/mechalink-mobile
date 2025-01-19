@@ -35,7 +35,7 @@ export default function JobsScreen() {
 
   // const [isSuccess, setIsSuccess] = useState(false);
   const [errors, setErrors] = useState<z.ZodFormattedError<typeof form> | null>(
-    null
+    null,
   );
 
   const { mutate: createJob, isPending: isLoading, isSuccess } = useCreateJob();

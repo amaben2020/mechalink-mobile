@@ -14,7 +14,7 @@ export const fetchAPI = async (url: string, options?: RequestInit) => {
           Authorization: `Bearer ${token}`,
         },
         ...options,
-      }
+      },
     );
     if (!response.ok) {
       new Error(`HTTP error! status: ${response.status}`);
@@ -41,7 +41,7 @@ export const useFetch = <T>(url: string, options?: RequestInit) => {
     try {
       const result = await fetchAPI(
         `${process.env.EXPO_PUBLIC_BACKEND_API + url}`,
-        options
+        options,
       );
       setData(result.data);
     } catch (err) {

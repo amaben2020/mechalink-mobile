@@ -32,7 +32,7 @@ export const useMechanicsStore = create<TMechanicsStore>()(
       set((state) => ({
         mechanic: state.mechanics.find((m) => m.id === mechanic.id),
       })),
-  })
+  }),
   // {
   //   name: 'mechanics-storage',
   // }

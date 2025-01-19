@@ -31,7 +31,7 @@ import GlobeLoader from '../GlobeLoader';
 
 export default function MechanicMapComponent() {
   const [location, setLocation] = useState<Location.LocationObject | null>(
-    null
+    null,
   );
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [region, setRegion] = useState({
@@ -71,7 +71,7 @@ export default function MechanicMapComponent() {
     } catch (error) {
       console.error(
         'Error updating user location or fetching mechanics:',
-        error
+        error,
       );
       setErrorMsg('Unable to update location or fetch nearby mechanics.');
     } finally {
@@ -110,7 +110,7 @@ export default function MechanicMapComponent() {
       setIsLoading(false);
       console.error(
         'Error updating user location or fetching mechanics:',
-        error
+        error,
       );
       setErrorMsg('Unable to update location or fetch nearby mechanics.');
     } finally {
@@ -161,7 +161,7 @@ export default function MechanicMapComponent() {
 
       const calculatedDistance = getDistance(
         userCoordinates,
-        mechanicCoordinates
+        mechanicCoordinates,
       );
       setDistance(calculatedDistance / 1000);
     }
@@ -236,7 +236,7 @@ export default function MechanicMapComponent() {
         {jobRequestLocation?.status === 'NOTIFYING' ? (
           <View
             className={clsx(
-              jobRequestLocation?.status === 'ON_THE_WAY' ? 'hidden' : ''
+              jobRequestLocation?.status === 'ON_THE_WAY' ? 'hidden' : '',
             )}
             style={{
               backgroundColor: '#FFA500',
@@ -264,7 +264,7 @@ export default function MechanicMapComponent() {
                 acceptOrDecline(
                   jobRequestLocation?.status === 'ON_THE_WAY'
                     ? 'ACCEPTED'
-                    : 'ON_THE_WAY'
+                    : 'ON_THE_WAY',
                 )
               }
             >
@@ -308,14 +308,14 @@ export default function MechanicMapComponent() {
                 acceptOrDecline(
                   jobRequestLocation?.status === 'ON_THE_WAY'
                     ? 'ACCEPTED'
-                    : 'ON_THE_WAY'
+                    : 'ON_THE_WAY',
                 )
               }
             >
-              <Text style={styles.buttonText}>Yes</Text>
+              <Text style={styles.buttonText}>Arrived</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.declineButton}>
-              <Text style={styles.buttonText}>No</Text>
+              <Text style={styles.buttonText}>Declined</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -338,7 +338,7 @@ export default function MechanicMapComponent() {
               shadowRadius: 3.84,
             }}
           >
-            <Text>IN PROGRESS cos the job is now started </Text>
+            <Text>IN PROGRESS.... cos the job is now started </Text>
 
             <Countdown
               minutes={10} // Start with 10 minutes

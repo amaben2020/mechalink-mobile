@@ -14,7 +14,7 @@ export const useSignupStore = create<TAuth>()(
     token: '',
     setToken: (token: string) => set({ token }),
     removeToken: () => set({ token: '' }),
-  })
+  }),
   //     {
   //       name: 'user-storage',
   //     }
@@ -48,7 +48,7 @@ export const useUserStore = create<TUserStore>()(
   (set) => ({
     user: { email: '', role: '' },
     setUser: (user) => set({ user }),
-  })
+  }),
   //     {
   //       name: 'user-store',
   //     }

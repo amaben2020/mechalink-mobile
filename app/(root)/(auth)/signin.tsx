@@ -25,7 +25,7 @@ export default function Signin() {
 
   const [isSuccess, setIsSuccess] = useState(false);
   const [errors, setErrors] = useState<z.ZodFormattedError<typeof form> | null>(
-    null
+    null,
   );
   const [isLoading, setIsLoading] = useState(false);
 

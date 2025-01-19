@@ -14,7 +14,7 @@ export const useGetNearbyMechanics = ({
     queryFn: async () => {
       try {
         const mechanicsResponse = await fetchAPI(
-          `nearby-mechanics?radius=${radius}&userId=${userId}`
+          `nearby-mechanics?radius=${radius}&userId=${userId}`,
         );
 
         return mechanicsResponse;
