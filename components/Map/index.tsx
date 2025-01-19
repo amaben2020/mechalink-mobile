@@ -7,10 +7,10 @@ import MapView, {
   Polyline,
 } from 'react-native-maps';
 import {
-  ActivityIndicator,
   Platform,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import * as Location from 'expo-location';
@@ -27,22 +27,24 @@ import {
   useGetNearbyMechanics,
   useGetUserJobRequest,
 } from '@/hooks/services/mechanics/useGetNearbyMechanics';
-import { images } from '@/constants/Icons';
 import GlobeLoader from '../GlobeLoader';
+import { useApproveJob } from '@/hooks/services/jobs/useApproveJob';
+import { useGetJobById } from '@/hooks/services/jobs/useGetJob';
+import {
+  ADO_REGION,
+  JobRequestStatuses,
+  JobStatuses,
+} from '@/constants/consts';
 
 export default function MapComponent() {
   const [location, setLocation] = useState<Location.LocationObject | null>(
     null,
   );
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [region, setRegion] = useState({
-    latitude: 9.0563,
-    longitude: 7.4985,
-    latitudeDelta: 0.9,
-    longitudeDelta: 0.8,
-  });
+  const [region, setRegion] = useState(ADO_REGION);
 
   const { user } = useUserStore();
+
   const userId = user?.id;
 
   const [isLoading, setIsLoading] = useState(true); // Initially loading
@@ -61,8 +63,12 @@ export default function MapComponent() {
   });
 
   const { jobRequest } = useJobRequestStore();
+  console.log('jobRequest[0].jobId', jobRequest[0].jobId);
 
-  console.log('location ===>', location?.coords);
+  const { mutate } = useApproveJob();
+  const { data: job, isLoading: isJobLoading } = useGetJobById(8);
+
+  console.log('job!!!', job);
 
   const { data: userJobRequestLocation, isLoading: isRequestLoading } =
     useGetUserJobRequest(String(userId));
@@ -73,7 +79,7 @@ export default function MapComponent() {
     jobRequest.find((request) => request.userId === Number(userId));
   console.log('userJobRequestLocation after!!!', userJobRequestLocation);
   const handleCountdownEnd = () => {
-    console.log('Countdown ended, triggering reassignment logic...');
+    console.log('Countdown ended, triggering reassignment logic..');
   };
 
   const handleStop = () => {
@@ -135,6 +141,8 @@ export default function MapComponent() {
     getCurrentLocation();
   }, []);
 
+  // fetch the job and hide the approval if approved
+
   useEffect(() => {
     if (userRequest?.mechanicId && location) {
       const selectedMechanic = data?.nearbyMechs.find(
@@ -178,10 +186,12 @@ export default function MapComponent() {
 
   const mapRef = useRef<any>(undefined);
 
+  console.log('jobRequest[0].jobId', jobRequest[0].jobId);
+
   useEffect(() => {
     if (mapRef.current && userRequest?.mechanicId) {
       const selectedMechanic = data?.nearbyMechs.find(
-        (mechanic) => mechanic.mechanicId == String(userRequest?.mechanicId),
+        (mechanic) => mechanic.mechanicId === String(userRequest?.mechanicId),
       );
 
       console.log('selectedMechanic', selectedMechanic);
@@ -210,11 +220,17 @@ export default function MapComponent() {
     }
   }, [data?.nearbyMechs, userRequest?.mechanicId, location]);
 
-  if (isLoading || isNearbyMechanicLoading || isRequestLoading) {
+  if (
+    isLoading ||
+    isNearbyMechanicLoading ||
+    isRequestLoading ||
+    isJobLoading
+  ) {
     return <GlobeLoader />;
   }
 
   console.log('userRequest==>', userRequest);
+  console.log('job==>', job);
 
   if (errorMsg || isError) {
     return (
@@ -270,20 +286,36 @@ export default function MapComponent() {
           </View>
         )}
 
-        {userRequest?.status === 'ACCEPTED' && (
-          <View className="flex flex-col gap-2 mb-20">
-            <LottieView
-              source={require('./../../assets/l-r.json')}
-              autoPlay
-              loop
-              style={{
-                height: 250,
-                width: 500,
-              }}
-            />
+        {userRequest?.status === JobRequestStatuses.ACCEPTED &&
+          !job?.job?.isApproved && (
+            <View className="flex flex-col gap-2 mb-20">
+              <LottieView
+                source={require('./../../assets/l-r.json')}
+                autoPlay
+                loop
+                style={{
+                  height: 250,
+                  width: 500,
+                }}
+              />
 
-            <Text className="font-JakartaBold text-white text-center">
-              JOB IN PROGRESS BY MECHANIC
+              <Text className="font-JakartaBold text-white text-center">
+                JOB IN PROGRESS BY MECHANIC
+              </Text>
+
+              <TouchableOpacity
+                onPress={() => mutate(jobRequest[0].jobId)}
+                className="bg-primary-500 p-5"
+              >
+                <Text> Approve Job</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+        {job?.job?.status === JobStatuses.COMPLETED && (
+          <View className="mt-20 bg-primary-500 ">
+            <Text className="text-white">
+              Job is completed {job?.job?.id}, proceed to payment
             </Text>
           </View>
         )}

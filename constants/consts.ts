@@ -36,3 +36,10 @@ export const UserRoles = {
   mechanic: 'mechanic',
   admin: 'admin',
 } as const;
+
+export const ADO_REGION = {
+  latitude: 9.0563,
+  longitude: 7.4985,
+  latitudeDelta: 0.9,
+  longitudeDelta: 0.8,
+};

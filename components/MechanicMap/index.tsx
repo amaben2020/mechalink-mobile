@@ -28,27 +28,25 @@ import {
   useJobRequestByMechanicId,
 } from '@/hooks/services/mechanics/useGetMechanicByUserId';
 import GlobeLoader from '../GlobeLoader';
+import { useCompleteJob } from '@/hooks/services/mechanics/useCompleteJob';
+import { useGetJobById } from '@/hooks/services/jobs/useGetJob';
+import { ADO_REGION } from '@/constants/consts';
 
 export default function MechanicMapComponent() {
   const [location, setLocation] = useState<Location.LocationObject | null>(
     null,
   );
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [region, setRegion] = useState({
-    latitude: 9.0563,
-    longitude: 7.4985,
-    latitudeDelta: 0.9,
-    longitudeDelta: 0.8,
-  });
+  const [region, setRegion] = useState(ADO_REGION);
 
   const { setLocation: setMechanicLocation } = useUserLocationStore();
   const [isLoading, setIsLoading] = useState(false);
   const [radius, setRadius] = useState<number>(2000);
-
+  const [distance, setDistance] = useState<number | null>(null);
   const { user } = useUserStore();
 
   const { data } = useGetMechanicByUserId(Number(user.id));
-
+  console.log(data);
   const {
     data: jobRequestLocation,
     isLoading: isJobRequestForMechanicLoading,
@@ -145,8 +143,6 @@ export default function MechanicMapComponent() {
     getCurrentLocation();
   }, []);
 
-  const [distance, setDistance] = useState<number | null>(null);
-
   useEffect(() => {
     if (jobRequestLocation?.location && location) {
       const userCoordinates = {
@@ -190,7 +186,7 @@ export default function MechanicMapComponent() {
 
   console.log('jobRequestLocation', jobRequestLocation);
   const handleCountdownEnd = () => {
-    console.log('Countdown ended, triggering reassignment logic...');
+    console.log('Countdown ended, triggering reassignment logic....');
   };
 
   const handleStop = () => {
@@ -207,9 +203,15 @@ export default function MechanicMapComponent() {
     }
   }, [jobRequestLocation?.status]);
 
-  if (isLoading || isJobRequestForMechanicLoading) {
+  const { mutate } = useCompleteJob();
+  const { data: jobById, isLoading: isJobLoading } = useGetJobById(8);
+
+  if (isJobRequestForMechanicLoading || isJobLoading) {
     return <GlobeLoader />;
   }
+
+  console.log('jobRequestLocation?.status===>', jobRequestLocation?.status);
+  console.log('jobById ==', jobById);
 
   return (
     <View style={styles.container}>
@@ -312,7 +314,7 @@ export default function MechanicMapComponent() {
                 )
               }
             >
-              <Text style={styles.buttonText}>Arrived</Text>
+              <Text style={styles.buttonText}>Arrived Destination</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.declineButton}>
               <Text style={styles.buttonText}>Declined</Text>
@@ -320,43 +322,60 @@ export default function MechanicMapComponent() {
           </View>
         )}
 
-        {jobRequestLocation?.status === 'ACCEPTED' && (
-          <View
-            style={{
-              backgroundColor: '#FFA500',
-              position: 'absolute',
-              top: 50,
-              left: '20%',
-              transform: [{ translateX: -0.5 * (80 / 100) * 100 }],
-              width: '60%',
-              padding: 15,
-              borderRadius: 15,
-              elevation: 4,
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.25,
-              shadowRadius: 3.84,
-            }}
-          >
-            <Text>IN PROGRESS.... cos the job is now started </Text>
-
-            <Countdown
-              minutes={10} // Start with 10 minutes
-              onCountdownEnd={handleCountdownEnd}
-              onStop={handleStop}
-              startCounter={startCounter}
-            />
-            <TouchableOpacity
-              style={styles.acceptButton}
-              onPress={() => acceptOrDecline('ON_THE_WAY')}
+        {jobById?.job.status !== 'COMPLETED' &&
+          jobRequestLocation?.status === 'ACCEPTED' && (
+            <View
+              style={{
+                backgroundColor: '#FFA500',
+                position: 'absolute',
+                top: 50,
+                left: '20%',
+                transform: [{ translateX: -0.5 * (80 / 100) * 100 }],
+                width: '60%',
+                padding: 15,
+                borderRadius: 15,
+                elevation: 4,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
+              }}
             >
-              <Text style={styles.buttonText}>Yes</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.declineButton}>
-              <Text style={styles.buttonText}>No</Text>
-            </TouchableOpacity>
-          </View>
-        )}
+              <Text>IN PROGRESS.... cos the job is now started </Text>
+
+              {!jobById?.job.isApproved && (
+                <>
+                  <Countdown
+                    minutes={10} // Start with 10 minutes
+                    onCountdownEnd={handleCountdownEnd}
+                    onStop={handleStop}
+                    startCounter={startCounter}
+                  />
+                  <TouchableOpacity
+                    style={styles.acceptButton}
+                    onPress={() => acceptOrDecline('ON_THE_WAY')}
+                  >
+                    <Text style={styles.buttonText}>Yes</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.declineButton}>
+                    <Text style={styles.buttonText}>No</Text>
+                  </TouchableOpacity>
+                </>
+              )}
+
+              {jobById?.job.isApproved && (
+                <TouchableOpacity
+                  onPress={() => mutate(8)}
+                  className="p-4 bg-primary-500 "
+                >
+                  <Text className="text-white font-JakartaExtraBold">
+                    {' '}
+                    Complete Job
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
         {location && (
           <>
             <Marker
