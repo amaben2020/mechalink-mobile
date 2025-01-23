@@ -44,7 +44,6 @@ export default function MapComponent() {
   const [region, setRegion] = useState(ADO_REGION);
 
   const { user } = useUserStore();
-
   const userId = user?.id;
   const [isLoading, setIsLoading] = useState(true);
   const [radius, setRadius] = useState<number>(2000);
