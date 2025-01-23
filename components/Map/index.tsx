@@ -47,7 +47,7 @@ export default function MapComponent() {
 
   const userId = user?.id;
 
-  const [isLoading, setIsLoading] = useState(true); // Initially loading
+  const [isLoading, setIsLoading] = useState(true);
   const [radius, setRadius] = useState<number>(2000);
   const { setLocation: setUserLocation } = useUserLocationStore();
   const { setMechanics } = useMechanicsStore();
