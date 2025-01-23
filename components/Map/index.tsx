@@ -61,7 +61,6 @@ export default function MapComponent() {
   });
 
   const { jobRequest } = useJobRequestStore();
-  console.log('jobRequest[0].jobId', jobRequest[0].jobId);
 
   const { mutate } = useApproveJob();
   const { data: job, isLoading: isJobLoading } = useGetJobById(8);
